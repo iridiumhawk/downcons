@@ -22,65 +22,62 @@ http://example.com/image.jpg picture.jpg
 В конце работы утилита должна выводить статистику - время работы и количество скачанных байт.
 */
 
-import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.*;
 
 
 public class Main {
 
-    public final static Logger LOG = initLogging(Main.class.getSimpleName());//Logger.getLogger();
-    private static Long workingTime;
-    private static Long downloadedBytes = 0L;
+    final static Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());//Logger.getLogger();
 
-    public static Logger initLogging(String loggerName) {
-        Logger logger = Logger.getLogger(loggerName);
-        logger.setLevel(Level.INFO);
-        int limitFileSize = 1000000; // 1 Mb
+    private static Long workingTime = 0L;
+    private static volatile AtomicLong downloadedBytes = new AtomicLong(0L);
 
-        FileHandler fh = null;
-        // Create txt Formatter
-        SimpleFormatter formatterTxt = new SimpleFormatter();
+    public Main() {
+        workingTime = 0L;
+        downloadedBytes = new AtomicLong(0L);
 
-        try {
-            fh = new FileHandler("queue.log", limitFileSize, 1, true);
-            fh.setFormatter(formatterTxt);
-            logger.addHandler(fh);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //console formatter
-        Handler ch = new ConsoleHandler();
-        ch.setFormatter(formatterTxt);
-//        logger.addHandler(ch);
-        return logger;
+        LOG.log(Level.INFO, "Main init");
     }
 
     public static void main(String[] args) {
 
-        if (args.length == 0) {
+        //todo change to default behavior without parameters
+/*        if (args.length == 0) {
             LOG.log(Level.WARNING, "input parameters absent");
             System.exit(-1);
-        }
+        }*/
 
-        LOG.log(Level.INFO, "program start");
+        LOG.log(Level.INFO, "Program started");
 
-        workingTime = System.currentTimeMillis();
+        setWorkingTime();
 
         Manager manager = new Manager(args);
 
         manager.execute();
 
-        workingTime = System.currentTimeMillis() - workingTime;
+        setWorkingTime();
 
-        System.out.println("Time spend to work: " + workingTime/1000 + "seconds");
+        System.out.println("Time spent for task: " + workingTime / 1000 + " seconds");
+
+        System.out.println("Total threads used: ");
 
         //todo calculate bytes
-        System.out.println("Bytes dowloaded: " + downloadedBytes );
 
-        LOG.log(Level.INFO, "program end");
+        System.out.println("Bytes downloaded: " + downloadedBytes.get());
 
+        LOG.log(Level.INFO, "Program ended");
 
+    }
+
+    //count time of program working time
+    private static void setWorkingTime() {
+        workingTime = System.currentTimeMillis() - workingTime;
+    }
+
+    //atomically add downloaded bytes to counter
+    static void addDownloadedBytes(long bytes) {
+        downloadedBytes.getAndAdd(bytes);
     }
 
 

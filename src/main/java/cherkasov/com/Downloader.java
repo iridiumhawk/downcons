@@ -1,4 +1,4 @@
 package cherkasov.com;
 
-public class Dowloader {
+public class Downloader {
 }

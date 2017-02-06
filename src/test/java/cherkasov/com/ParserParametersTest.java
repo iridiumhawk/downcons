@@ -5,16 +5,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by hawk on 28.11.2016.
- */
 public class ParserParametersTest {
     private final String[] argsFull = {"-n", "120", "-l", "1000", "-f", "links.txt", "-o", "output"};
     private ParserParameters parser;
 
     @Before
-    public void init() {
-
+    public void initTest() {
         parser = new ParserParameters(argsFull);
     }
 

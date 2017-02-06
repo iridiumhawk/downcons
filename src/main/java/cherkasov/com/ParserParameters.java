@@ -13,7 +13,7 @@ public class ParserParameters {
 
     //default values
     private int numberOfThreads = 1;
-    private int maxDownloadSpeed = 1000000;
+    private int maxDownloadSpeed = 1000000; //bytes in second
     private String fileNameWithLinks = "links.txt";
     private String outputFolder = "download";
 
@@ -55,7 +55,7 @@ public class ParserParameters {
         if (parameters.get(fileNameWithLinksKey) != null) {
             this.fileNameWithLinks = parameters.get(fileNameWithLinksKey);
         } else {
-            throw new RuntimeException("NO file with links");
+            throw new RuntimeException("NO file with links exist!");
             // exit            System.exit(-1);
         }
 
@@ -72,7 +72,7 @@ public class ParserParameters {
             this.outputFolder = parameters.get(outputFolderKey);
         }
 
-        LOG.log(Level.INFO, "parsing args done");
+        LOG.log(Level.INFO, "parsing args was done");
 
     }
 
@@ -82,21 +82,28 @@ public class ParserParameters {
 //        System.out.println(argsList);
 
 //todo check array index outbound
-        int index = argsList.indexOf(numberOfThreadsKey) + 1;
-        if (checkParameterOnCorrect(argsList.get(index))) {
-            parameters.put(numberOfThreadsKey,argsList.get(index) );
-        }
-        index = argsList.indexOf(maxDownloadSpeedKey) + 1;
-        if (checkParameterOnCorrect(argsList.get(index))) {
-            parameters.put(maxDownloadSpeedKey,argsList.get(index));
-        }
-        index = argsList.indexOf(fileNameWithLinksKey) + 1;
-        if (checkParameterOnCorrect(argsList.get(index))) {
-        parameters.put(fileNameWithLinksKey, argsList.get(index));
-        }
-        index = argsList.indexOf(outputFolderKey) + 1;
-        if (checkParameterOnCorrect(argsList.get(index))) {
-            parameters.put(outputFolderKey, argsList.get(index));
+        try {
+
+//todo make simpler
+            int index = argsList.indexOf(numberOfThreadsKey) + 1;
+            if (checkParameterOnCorrect(argsList.get(index))) {
+                parameters.put(numberOfThreadsKey, argsList.get(index));
+            }
+            index = argsList.indexOf(maxDownloadSpeedKey) + 1;
+            if (checkParameterOnCorrect(argsList.get(index))) {
+                parameters.put(maxDownloadSpeedKey, argsList.get(index));
+            }
+            index = argsList.indexOf(fileNameWithLinksKey) + 1;
+            if (checkParameterOnCorrect(argsList.get(index))) {
+                parameters.put(fileNameWithLinksKey, argsList.get(index));
+            }
+            index = argsList.indexOf(outputFolderKey) + 1;
+            if (checkParameterOnCorrect(argsList.get(index))) {
+                parameters.put(outputFolderKey, argsList.get(index));
+            }
+
+        } catch (ArrayIndexOutOfBoundsException e){
+            LOG.log(Level.WARNING,"index out of bounds");
         }
     }
 
