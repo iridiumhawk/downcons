@@ -10,12 +10,13 @@ public class ParserLinks {
     private Map<String, String> linksFiles;
 
     public ParserLinks(String fileName) {
+
         parse(fileName);
 
         LOG.log(Level.INFO, "parsing file with links done");
     }
 
     private void parse(String fileName) {
-
+//add to map key=fileoutput, value=url
     }
 }
