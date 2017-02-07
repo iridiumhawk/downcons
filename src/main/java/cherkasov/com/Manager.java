@@ -2,44 +2,23 @@ package cherkasov.com;
 
 public class Manager {
     private String[] args;
-    ParserParameters parserParameters;
-    ParserLinks parserLinks;
-    //queue
-//    private static volatile AtomicLong downloadedBytes = new AtomicLong(0L);
-
 
     public Manager(String[] args) {
-
         this.args = args;
-
-        //parsing parameters
-        parserParameters = new ParserParameters(args);
-
-        //parsing links file
-        parserLinks = new ParserLinks(parserParameters.getFileNameWithLinks());
-
-        //create concurrency queue for tasks, from which threads will take url for download
-
     }
 
     public void execute() {
 
+        //parsing parameters
+        ParserParameters parserParameters = new ParserParameters(args);
 
-        //create thread pool executor
+        //parsing links file
+        ParserLinks parserLinks = new ParserLinks(parserParameters.getFileNameWithLinks());
 
-//        LOG.log(Level.INFO, "thread pool start");
+        //create concurrency queue for tasks, from which threads will take url for download
+        Downloader downloader = new Downloader(parserLinks.getQueueTasks(),parserParameters);
+        downloader.start();
 
-        //start threads
-
-
-//        LOG.log(Level.INFO, "download start");
-
-        //each thread download with max speed (curl, get bytes, count time, if speed exceed - sleep for timeslot)
-
-        //on exit thread write downloaded bytes
-
-
-//        LOG.log(Level.INFO, "download done");
     }
 
 }

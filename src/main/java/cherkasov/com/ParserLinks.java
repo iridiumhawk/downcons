@@ -1,22 +1,47 @@
 package cherkasov.com;
 
-import java.util.Map;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-import static cherkasov.com.Main.LOG;
 
+import static cherkasov.com.Main.LOG;
 
 //parsing file with links
 public class ParserLinks {
-    private Map<String, String> linksFiles;
+    private ConcurrentLinkedQueue<DownloadEntity> queueTasks = new ConcurrentLinkedQueue<>();
+
+    public ConcurrentLinkedQueue<DownloadEntity> getQueueTasks() {
+        return queueTasks;
+    }
 
     public ParserLinks(String fileName) {
 
-        parse(fileName);
+        parseLinks(fileName);
 
         LOG.log(Level.INFO, "parsing file with links done");
     }
 
-    private void parse(String fileName) {
-//add to map key=fileoutput, value=url
+    private void parseLinks(String fileName) {
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+
+            for (String line : lines) {
+                String[] urlName = line.split(" "); //trim?
+                queueTasks.add(new DownloadEntity(urlName[0], urlName[1]));
+
+//                LOG.log(Level.INFO, urlName[0] +" : "+ urlName[1]);
+            }
+
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, e.getMessage());
+        }
+
     }
 }
+

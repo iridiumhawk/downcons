@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class MainTest {
-    private final String[] argsAllFullCorrect = {"-n", "120", "-l", "1000", "-f", "links.txt", "-o", "output"};
+    private final String[] argsAllFullCorrect = {"-n", "2", "-l", "1000", "-f", "C:\\java\\downcons\\src\\test\\resources\\links.txt", "-o", "output"};
     private final String[] argsWithMissedParam = {"-n", "-l", "1000", "-f", "links.txt", "-o", "output"};
     private final String[] argsWithMissedParamAtEnd = {"-n", "120", "-l", "1000", "-f", "links.txt", "-o"};
     private final String[] argsWithFileNameEmpty = {"-n", "120", "-l", "1000", "-f", "", "-o", "output"};

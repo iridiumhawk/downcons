@@ -13,7 +13,7 @@ class ProjectLogger {
 
         Logger logger = Logger.getLogger(loggerName);
 
-        logger.setLevel(Level.INFO);
+        logger.setLevel(Level.WARNING);
 
         FileHandler fileHandler = null;
 

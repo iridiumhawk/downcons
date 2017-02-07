@@ -3,3 +3,13 @@ http://example.com/image.jpg picture.jpg
 http://examepl.com/image1.jpg picture.jpg
 http://example.com/archive.zip first_archive.zip
 http://example.com/archive.zip second_archive.zip
+ftp://ftp.dungeonrunners.com/DungeonRunnersSetup.exe DungeonRunnersSetup.exe
+http://www.triachnid.com/blastminersetup128.exe blastminersetup128.exe
+http://www.3dnews.ru/files/pub/drivers/nvidia/372.90-desktop-win10-32bit-international-whql.exe nvidia.exe
+ww.3dnews.ru/files/pub/drivers/SOUND/realtek/0001-32-64bits_Win2000_WinXP_2003_WDM_R274.exe realtek.exe
+http://small.drivermax.com/soft/dmx/drivermax.exe 123.zip
+http://www.orange-defender.com/soft/orange-defender/orangedefender_setup.exe orangedefender_setup.ex
+http://download.advanceduninstaller.com/soft/uninstaller/Advanced_Uninstaller12.exe 1234.exe
+http://innofiles.com/soft/neosetup/NeoSetup_Updater.exe 12345.exe
+http://innofiles.com/soft/cleaner/advanced_disk_cleaner.exe 123456.exe
+http://www.innovative-sol.com/soft/taskmanager/advanced_task_manager.exe 1234567.exe

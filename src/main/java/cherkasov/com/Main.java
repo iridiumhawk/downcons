@@ -22,20 +22,16 @@ http://example.com/image.jpg picture.jpg
 В конце работы утилита должна выводить статистику - время работы и количество скачанных байт.
 */
 
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.*;
-
 
 public class Main {
 
     final static Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());//Logger.getLogger();
 
     private static Long workingTime = 0L;
-    private static volatile AtomicLong downloadedBytes = new AtomicLong(0L);
 
     public Main() {
         workingTime = 0L;
-        downloadedBytes = new AtomicLong(0L);
 
         LOG.log(Level.INFO, "Main init");
     }
@@ -48,6 +44,7 @@ public class Main {
             System.exit(-1);
         }*/
 
+        LOG.log(Level.INFO, "========================================================");
         LOG.log(Level.INFO, "Program started");
 
         setWorkingTime();
@@ -56,15 +53,16 @@ public class Main {
 
         manager.execute();
 
+        //todo calculate bytes
+        Long downloadedBytes = 0L;
+
         setWorkingTime();
 
         System.out.println("Time spent for task: " + workingTime / 1000 + " seconds");
 
-        System.out.println("Total threads used: ");
+//        System.out.println("Total threads used: ");
 
-        //todo calculate bytes
-
-        System.out.println("Bytes downloaded: " + downloadedBytes.get());
+        System.out.println("Bytes downloaded: " + downloadedBytes);
 
         LOG.log(Level.INFO, "Program ended");
 
@@ -73,11 +71,6 @@ public class Main {
     //count time of program working time
     private static void setWorkingTime() {
         workingTime = System.currentTimeMillis() - workingTime;
-    }
-
-    //atomically add downloaded bytes to counter
-    static void addDownloadedBytes(long bytes) {
-        downloadedBytes.getAndAdd(bytes);
     }
 
 

@@ -52,6 +52,13 @@ public class ParserParameters {
 
         parseArgs(args);
 
+        parseParam();
+
+        LOG.log(Level.INFO, "parsing args was done");
+
+    }
+
+    private void parseParam() {
         if (parameters.get(fileNameWithLinksKey) != null) {
             this.fileNameWithLinks = parameters.get(fileNameWithLinksKey);
         } else {
@@ -73,12 +80,19 @@ public class ParserParameters {
         }
 
         LOG.log(Level.INFO, "parsing args was done");
-
     }
 
     private void parseArgs(String[] args) {
 
         List<String> argsList = Arrays.asList(args);
+
+        //todo change getting params
+/*        for (String input: args             ) {
+            switch (input){
+                case "-r": break;
+                default:
+            }
+        }*/
 //        System.out.println(argsList);
 
 //todo check array index outbound
