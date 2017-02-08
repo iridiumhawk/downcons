@@ -20,7 +20,6 @@ public class Downloader {
         this.params = parserParameters;
     }
 
-    //threads executor
     private void threadsExecutor(int threadCounter) {
 
         final CountDownLatch latch = new CountDownLatch(threadCounter);
@@ -42,7 +41,7 @@ public class Downloader {
                     }
                 }
 
-                //if tasks ended
+                //when tasks ended
                 latch.countDown();
             }
         };
@@ -61,18 +60,17 @@ public class Downloader {
         }
 
         LOG.log(Level.INFO, "download was done");
-
     }
 
     private void downloadFile(DownloadEntity urlFile, int maxDownloadSpeed) throws IOException, InterruptedException {
         LOG.log(Level.INFO, "download url: " + urlFile.getUrl() + " start");
 
-        //each thread download with max speed (curl, get bytes, count time, if speed exceed - sleep for timeslot)
+
 
 //        URL link = new URL("http://cvde.com/robots.txt");
         URL link = new URL(urlFile.getUrl());
 
-        //output file name + folder
+        //todo output file name + folder
         String fileName = urlFile.getFileName();
 
         InputStream in = new BufferedInputStream(link.openStream());
@@ -84,7 +82,8 @@ public class Downloader {
         while (-1 != (n = in.read(buf))) {
 //            if speed > maxDownloadSpeed
             //        TimeUnit.SECONDS.sleep(5L);
-
+//скорость потоков одна на всех, распределять честно?
+//each thread download with max speed (curl, get bytes, count time, if speed exceed - sleep for timeslot)
 
             out.write(buf, 0, n);
         }
@@ -98,7 +97,7 @@ public class Downloader {
 
         System.out.println("Finished");
 
-        //on exit thread write downloaded bytes
+        //todo on exit thread write downloaded bytes
         addDownloadedBytes(0);
     }
 
@@ -110,7 +109,6 @@ public class Downloader {
     private void addDownloadedBytes(long bytes) {
         downloadedBytes.getAndAdd(bytes);
     }
-
 
 }
 

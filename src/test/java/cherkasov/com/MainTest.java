@@ -3,6 +3,7 @@ package cherkasov.com;
 import org.junit.Before;
 import org.junit.Test;
 
+//full test
 public class MainTest {
     private final String[] argsAllFullCorrect = {"-n", "2", "-l", "1000", "-f", "C:\\java\\downcons\\src\\test\\resources\\links.txt", "-o", "output"};
     private final String[] argsWithMissedParam = {"-n", "-l", "1000", "-f", "links.txt", "-o", "output"};
