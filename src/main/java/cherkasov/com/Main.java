@@ -38,12 +38,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //todo change to default behavior without parameters
-/*        if (args.length == 0) {
-            LOG.log(Level.WARNING, "input parameters absent");
-            System.exit(-1);
-        }*/
-
         LOG.log(Level.INFO, "========================================================");
         LOG.log(Level.INFO, "Program started");
 

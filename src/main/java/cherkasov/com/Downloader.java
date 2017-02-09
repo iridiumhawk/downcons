@@ -3,6 +3,9 @@ package cherkasov.com;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -14,6 +17,8 @@ public class Downloader {
     private ParserParameters params;
     private volatile AtomicLong downloadedBytes = new AtomicLong(0L);
 
+    public Downloader() {
+    }
 
     public Downloader(ConcurrentLinkedQueue<DownloadEntity> queueTasks, ParserParameters parserParameters) {
         this.queueTasks = queueTasks;
@@ -31,7 +36,7 @@ public class Downloader {
                 while (!queueTasks.isEmpty()) {
                     try {
 
-                        downloadFile(queueTasks.poll(), params.getMaxDownloadSpeed());
+                        downloadFile(queueTasks.poll(), params.getOutputFolder());
 
                         //for test
 //                        queueTasks.clear();
@@ -62,43 +67,70 @@ public class Downloader {
         LOG.log(Level.INFO, "download was done");
     }
 
-    private void downloadFile(DownloadEntity urlFile, int maxDownloadSpeed) throws IOException, InterruptedException {
-        LOG.log(Level.INFO, "download url: " + urlFile.getUrl() + " start");
+    //todo private
+    public void downloadFile(DownloadEntity urlFile, String folder) throws IOException, InterruptedException {
+//        LOG.log(Level.INFO, "download url: " + urlFile.getUrl() + " start");
 
+        int inputBuffer = 100000;
+        int bytesDownloaded = 0;
+        long timeSpent = 0;
 
+        Path dir = Paths.get(folder);
 
-//        URL link = new URL("http://cvde.com/robots.txt");
+        if (!Files.isDirectory(dir)) {
+            Files.createDirectory(dir);
+        }
+
+//        URL link = new URL("http://.txt");
         URL link = new URL(urlFile.getUrl());
 
         //todo output file name + folder
-        String fileName = urlFile.getFileName();
+        String fileName = folder + "\\" + urlFile.getFileName();
 
         InputStream in = new BufferedInputStream(link.openStream());
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        int n = 0;
+        FileOutputStream fos = new FileOutputStream(fileName);
 
+        byte[] buf = new byte[inputBuffer];
 
-        while (-1 != (n = in.read(buf))) {
+        int n;
+        while (true) {
+            Long timer = System.currentTimeMillis();
+
+            n = in.read(buf);
+
+            timer = System.currentTimeMillis() - timer;
+
+            timeSpent += timer;
+            if (n == -1) {
+                break;
+            }
+
+//            System.out.println("get: "+n+" byte, "+timer+" nanosec");
+
 //            if speed > maxDownloadSpeed
             //        TimeUnit.SECONDS.sleep(5L);
 //скорость потоков одна на всех, распределять честно?
 //each thread download with max speed (curl, get bytes, count time, if speed exceed - sleep for timeslot)
 
-            out.write(buf, 0, n);
-        }
-        out.close();
-        in.close();
-        byte[] response = out.toByteArray();
+            fos.write(buf,0, n);
 
-        FileOutputStream fos = new FileOutputStream(fileName);
-        fos.write(response);
+            bytesDownloaded += n;
+
+        }
+
+        in.close();
         fos.close();
 
-        System.out.println("Finished");
+        System.out.println("Thread finished");
 
         //todo on exit thread write downloaded bytes
-        addDownloadedBytes(0);
+        addDownloadedBytes(bytesDownloaded);
+
+        System.out.println("download bytes: " + bytesDownloaded);
+        System.out.println("spent time: " + timeSpent);
+
+//        LOG.log(Level.INFO, "download bytes: " + bytesDownloaded);
+
     }
 
     public void start() {

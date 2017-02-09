@@ -23,6 +23,8 @@ public class DownloaderTest {
     @Test
     public void start() throws Exception {
 
+        new Downloader().downloadFile(new DownloadEntity("http://www.innovative-sol.com/soft/taskmanager/advanced_task_manager.exe","advanced_task_manager.exe"), "download");
+
     }
 
 }
