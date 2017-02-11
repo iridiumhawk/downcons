@@ -6,22 +6,23 @@ import java.util.logging.*;
 class ProjectLogger {
 
     private static final String LOG_FILE_NAME = "downloader.log";
-    private static final int LIMIT_FILE_SIZE = 1000000; // 1 Mb
+    private static final int LIMIT_LOG_FILE_SIZE = 1000000; // 1 Mb
+    private static final Level LOGGER_LEVEL = Level.INFO;
 
     //todo change format logger
     static Logger initFileLogging(String loggerName) {
 
         Logger logger = Logger.getLogger(loggerName);
 
-        logger.setLevel(Level.WARNING);
+        logger.setLevel(LOGGER_LEVEL);
 
-        FileHandler fileHandler = null;
+        FileHandler fileHandler;
 
         // Create txt Formatter
         SimpleFormatter formatterTxt = new SimpleFormatter();
 
         try {
-            fileHandler = new FileHandler(LOG_FILE_NAME, LIMIT_FILE_SIZE, 1, true);
+            fileHandler = new FileHandler(LOG_FILE_NAME, LIMIT_LOG_FILE_SIZE, 1, true);
             fileHandler.setFormatter(formatterTxt);
             logger.addHandler(fileHandler);
 
@@ -33,7 +34,6 @@ class ProjectLogger {
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(formatterTxt);
 
-//        logger.addHandler(consoleHandler);
         return logger;
     }
 }

@@ -1,13 +1,13 @@
 package cherkasov.com;
 
 public class Manager {
-    private String[] args;
+    private final String[] args;
 
     public Manager(String[] args) {
         this.args = args;
     }
 
-    public void execute() {
+    public long execute() {
 
         //parsing parameters
         ParserParameters parserParameters = new ParserParameters(args);
@@ -16,9 +16,11 @@ public class Manager {
         ParserLinks parserLinks = new ParserLinks(parserParameters.getFileNameWithLinks());
 
         //create concurrency queue for tasks, from which threads will take url for download
-        Downloader downloader = new Downloader(parserLinks.getQueueTasks(),parserParameters);
+        Downloader downloader = new Downloader(parserLinks.getQueueTasks(), parserParameters);
+
         downloader.start();
 
+        return downloader.getDownloadedBytes().get();
     }
 
 }

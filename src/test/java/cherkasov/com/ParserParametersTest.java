@@ -5,18 +5,25 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ParserParametersTest {
-    private static final String[] argsFull = {"-n", "120", "-l", "1000", "-f", "links.txt", "-o", "output"};
+    private  final String[] argsFull = {"-n", "120", "-l", "1000", "-f", "links.txt", "-o", "output"};
     //    private final String[] argsCrack = {"-n", "-l", "1000", "-f", "-f" , "links.txt", "-o", "output"};
-    private static ParserParameters parser;
+    private final String[] argsWithMissedParam = {"-n", "-l", "1000", "-f", "links.txt", "-o", "output"};
+    private final String[] argsWithMissedParamAtEnd = {"-n", "120", "-l", "1000", "-f", "links.txt", "-o"};
+    private final String[] argsWithFileNameEmpty = {"-n", "120", "-l", "1000", "-f", "", "-o", "output"};
+    private final String[] argsWithFileNameMissed = {"-n", "120", "-l", "1000", "-f", "-o", "output"};
+    private final String[] argsNotFull = {"-f", "links.txt"};
+    private final String[] argsWithNoParam = {""};
 
-    @BeforeClass
-    public static void initTest() {
+    private  ParserParameters parser;
+
+    @Before
+    public  void initTest() {
         parser = new ParserParameters(argsFull);
     }
 
-    @AfterClass
+    @After
     public void tearDown() throws Exception {
-        parser = null;
+//        parser = null;
     }
 
     @Test

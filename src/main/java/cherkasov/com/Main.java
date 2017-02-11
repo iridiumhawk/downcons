@@ -22,6 +22,7 @@ http://example.com/image.jpg picture.jpg
 В конце работы утилита должна выводить статистику - время работы и количество скачанных байт.
 */
 
+import java.text.MessageFormat;
 import java.util.logging.*;
 
 public class Main {
@@ -41,32 +42,26 @@ public class Main {
         LOG.log(Level.INFO, "========================================================");
         LOG.log(Level.INFO, "Program started");
 
-        setWorkingTime();
-
+//        setWorkingTime();
+        workingTime = System.currentTimeMillis();
         Manager manager = new Manager(args);
 
-        manager.execute();
-
         //todo calculate bytes
-        Long downloadedBytes = 0L;
+        Long downloadedBytes = manager.execute();
 
-        setWorkingTime();
+//        setWorkingTime();
+        workingTime = System.currentTimeMillis() - workingTime;
 
-        System.out.println("Time spent for task: " + workingTime / 1000 + " seconds");
+        System.out.println("Time spent for all: " + workingTime / 1000 + " seconds");
 
-//        System.out.println("Total threads used: ");
-
-        System.out.println("Bytes downloaded: " + downloadedBytes);
+        System.out.println(MessageFormat.format("Total downloaded: {0} bytes ({1} Megabytes)", downloadedBytes, downloadedBytes / 1024 / 1024));
 
         LOG.log(Level.INFO, "Program ended");
-
     }
 
     //count time of program working time
-    private static void setWorkingTime() {
+/*    private static void setWorkingTime() {
         workingTime = System.currentTimeMillis() - workingTime;
-    }
-
-
+    }*/
 }
 

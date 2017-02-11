@@ -9,9 +9,10 @@ http://www.3dnews.ru/files/pub/drivers/nvidia/372.90-desktop-win10-32bit-interna
 www.3dnews.ru/files/pub/drivers/SOUND/realtek/0001-32-64bits_Win2000_WinXP_2003_WDM_R274.exe realtek.exe
 http://small.drivermax.com/soft/dmx/drivermax.exe drivermax.zip
 http://small.drivermax.com/soft/dmx/drivermax.exe drivermax.exe
+
 http://www.orange-defender.com/soft/orange-defender/orangedefender_setup.exe orangedefender_setup.exe
-http://download.advanceduninstaller.com/soft/uninstaller/Advanced_Uninstaller12.exe 1234.exe
-http://innofiles.com/soft/neosetup/NeoSetup_Updater.exe 12345.exe
-http://innofiles.com/soft/cleaner/advanced_disk_cleaner.exe 123456.exe
-http://www.innovative-sol.com/soft/taskmanager/advanced_task_manager.exe 1234567.exe
-http://libreoffice-mirror.rbc.ru/pub/libreoffice/libreoffice/stable/5.2.5/win/x86/LibreOffice_5.2.5_Win_x86.msi
+http://download.advanceduninstaller.com/soft/uninstaller/Advanced_Uninstaller12.exe Advanced_Uninstaller12.exe
+http://innofiles.com/soft/neosetup/NeoSetup_Updater.exe NeoSetup_Updater.exe
+http://innofiles.com/soft/cleaner/advanced_disk_cleaner.exe advanced_disk_cleaner.exe
+http://www.innovative-sol.com/soft/taskmanager/advanced_task_manager.exe advanced_task_manager.exe
+#http://libreoffice-mirror.rbc.ru/pub/libreoffice/libreoffice/stable/5.2.5/win/x86/LibreOffice_5.2.5_Win_x86.msi LibreOffice_5.2.5_Win_x86.msi

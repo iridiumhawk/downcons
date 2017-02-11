@@ -23,9 +23,10 @@ public class ParserLinksTest {
 
     }
 
+
     @Test
     public void parserTest(){
-        assertSame(new DownloadEntity("http://example.com/archive.zip", "my_archive.zip"), parserLinks.getQueueTasks().poll());
+        assertEquals(new DownloadEntity("http://example.com/archive.zip", "my_archive.zip"), parserLinks.getQueueTasks().poll());
     }
 
 }
