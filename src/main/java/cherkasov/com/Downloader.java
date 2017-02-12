@@ -4,81 +4,113 @@ package cherkasov.com;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import static cherkasov.com.Main.LOG;
 
 public class Downloader {
-    private final ConcurrentLinkedQueue<DownloadEntity> queueTasks;
-    private final ConcurrentHashMap<String, Integer> currentSpeedOfThreads = new ConcurrentHashMap<>(); //for thread
-    private final ParserParameters params;
+    private final ConcurrentLinkedQueue<DownloadEntity> queueThreadTasks;
+    private final ConcurrentHashMap<String, Long> currentSpeedOfThreads = new ConcurrentHashMap<>(); //for thread speed
+    private final ParserParameters parametersOfWork;
 
-    private volatile AtomicLong downloadedBytes = new AtomicLong(0L);
-    private volatile AtomicLong spentTime = new AtomicLong(0L);
+    private volatile AtomicLong downloadedBytesSum = new AtomicLong(0L);
+    private volatile AtomicLong spentTimeSummary = new AtomicLong(0L);
 
     private final int middleSpeedOneThread;
     private final int inputBufferOneThread;
-    private final List<Long> statistic = new ArrayList<>();
+    private final int nanoTimeToSeconds = 1_000_000_000;
+    private final int granularityOfManagement = 10;
+
+    private final List<String> statistic = new ArrayList<>();
 
 /*    public Downloader() {
     }*/
 
-    public AtomicLong getDownloadedBytes() {
-        return downloadedBytes;
+    public AtomicLong getDownloadedBytesSum() {
+        return downloadedBytesSum;
     }
 
     public Downloader(ConcurrentLinkedQueue<DownloadEntity> queueTasks, ParserParameters parserParameters) {
-        this.queueTasks = queueTasks;
-        this.params = parserParameters;
-        this.middleSpeedOneThread = params.getMaxDownloadSpeed() / params.getNumberOfThreads();
-        this.inputBufferOneThread = this.middleSpeedOneThread / 10; //about 100 ms for one read buffer
+        this.queueThreadTasks = queueTasks;
+        this.parametersOfWork = parserParameters;
+        this.middleSpeedOneThread = parametersOfWork.getMaxDownloadSpeed() / parametersOfWork.getNumberOfThreads();
+        this.inputBufferOneThread = middleSpeedOneThread / granularityOfManagement; //haw often thread will be managed
     }
 
 
     public void start() {
-        Path dir = Paths.get(params.getOutputFolder());
 
-        if (!Files.isDirectory(dir)) {
-            try {
-                Files.createDirectory(dir);
-            } catch (IOException e) {
-//                e.printStackTrace();
-                LOG.log(Level.WARNING, "createDirectory Exception, " + e.getMessage());
-            }
-        }
+        threadMonitor();
 
-        threadsExecutor(params.getNumberOfThreads());
+        threadsExecutor(parametersOfWork.getNumberOfThreads());
+
+        saveStatistics();
     }
 
+    private void saveStatistics() {
+        final FileWriter fileWriter;
+        try {
+            fileWriter = new FileWriter("statistic.txt");
+
+            synchronized (this) {
+                statistic.forEach(str -> {
+                    try {
+                        fileWriter.write(str);
+                    } catch (IOException e) {
+                    }
+                });
+            }
+            fileWriter.close();
+
+        } catch (IOException e) {
+        }
+    }
+
+    //for testing
+    private void threadMonitor() {
+
+        Thread threadMonitor = new Thread(() -> {
+            while (true) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                }
+                speedInfo();
+            }
+        });
+
+        threadMonitor.setDaemon(true);
+        threadMonitor.start();
+    }
+
+    //launch all threads
     private void threadsExecutor(int threadCounter) {
 
         final CountDownLatch latch = new CountDownLatch(threadCounter);
 
         Runnable runner = () -> {
 
-            while (!queueTasks.isEmpty()) {
+            while (!queueThreadTasks.isEmpty()) {
                 try {
-                    downloadFile(queueTasks.poll(), Thread.currentThread().getName());
+                    downloadFile(queueThreadTasks.poll(), Thread.currentThread().getName());
 
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Download Exception, " + e.getMessage());
                 }
             }
 
-            //when tasks ended
-            latch.countDown();
+            latch.countDown(); //when all tasks in queue ended
         };
 
         ExecutorService service = Executors.newFixedThreadPool(threadCounter);
-        LOG.log(Level.INFO, "thread pool started");
+        LOG.log(Level.INFO, "Thread pool started");
 
         for (int i = 0; i < threadCounter; i++) {
             service.execute(runner);
@@ -91,22 +123,26 @@ public class Downloader {
         }
 
         LOG.log(Level.INFO, "Download was done");
-        LOG.log(Level.INFO, MessageFormat.format("Time spent for all threads: {0} seconds", this.spentTime.get() / 1000));
+        LOG.log(Level.INFO, MessageFormat.format("Time spent summary for all threads: {0} seconds", this.spentTimeSummary.get() / nanoTimeToSeconds));
     }
 
     //todo private
     private void downloadFile(DownloadEntity urlFile, String nameThread) {
-        LOG.log(Level.INFO, "download url: " + urlFile.getUrl() + " start");
-        currentSpeedOfThreads.put(nameThread, this.middleSpeedOneThread);
+        if (urlFile == null) return;
 
-        int inputBuffer = this.inputBufferOneThread;
-        int timePauseThread = 0;
-        int bytesDownloaded = 0;
-        int timeSpentThread = 0;
+        LOG.log(Level.INFO, "Download url: " + urlFile.getUrl() + " start");
 
+//        currentSpeedOfThreads.put(nameThread, 0 );//this.middleSpeedOneThread
+
+//        int inputBuffer = this.inputBufferOneThread;
+        long timePauseThread = 100_000_000; //initial pause 100 msec for eliminate burst download
+        long bytesDownloaded = 0;
+        long timeSpentByTask = 0;
+        long speedCurrentThread;
 
 //        URL link = new URL("http://.txt");
-        URL link = null;
+        URL link;
+
         try {
             link = new URL(urlFile.getUrl());
         } catch (MalformedURLException e) {
@@ -116,7 +152,7 @@ public class Downloader {
         }
 
         //todo change path for win and linux
-        String fileName = params.getOutputFolder() + "\\" + urlFile.getFileName();
+        String fileName = parametersOfWork.getOutputFolder() + "\\" + urlFile.getFileName();
 
 
         try (
@@ -124,11 +160,11 @@ public class Downloader {
                 FileOutputStream fos = new FileOutputStream(fileName)
         ) {
 
-            byte[] buf = new byte[inputBuffer];
+            byte[] buf = new byte[this.inputBufferOneThread];
 
             int numBytesRead;
             while (true) {
-                Long timer = System.currentTimeMillis();
+                Long timer = System.nanoTime();
 
                 numBytesRead = in.read(buf);
 
@@ -136,26 +172,28 @@ public class Downloader {
                     break;
                 }
 
-                timer = System.currentTimeMillis() - timer;
+                timer = System.nanoTime() - timer;
 
-                timeSpentThread += timer;
+                timeSpentByTask += timer;
 
                 fos.write(buf, 0, numBytesRead);
 
                 bytesDownloaded += numBytesRead;
 
-                int speedCurrentThread = 0;
-
-                if (timer > 0) {
-                    //approximately
-                    speedCurrentThread = 1000 / timer.intValue() * inputBuffer;
+                if (timer <= 0) {
+                    timer = 1L;
                 }
+
+                //approximately
+                speedCurrentThread = nanoTimeToSeconds / (timer + timePauseThread) * this.inputBufferOneThread;
 
                 currentSpeedOfThreads.put(nameThread, speedCurrentThread);
 
                 timePauseThread = getTimePauseThread(timePauseThread, speedCurrentThread);
 
-                TimeUnit.MILLISECONDS.sleep(timePauseThread);
+                TimeUnit.NANOSECONDS.sleep(timePauseThread);
+
+                timeSpentByTask += timePauseThread;
             }
 
 
@@ -166,48 +204,54 @@ public class Downloader {
             LOG.log(Level.WARNING, "InterruptedException, " + e.getMessage());
         }
 
-
-
-        //todo on exit thread write downloaded bytes
+        //on exit thread write downloaded bytes
         addDownloadedBytes(bytesDownloaded);
 
         //sum time of all threads, it will greater than time work for program
-        addSpentTime(timeSpentThread);
+        addSpentTime(timeSpentByTask);
 
+        currentSpeedOfThreads.put(nameThread, 0L);
 
-//        System.out.println("download bytes: " + bytesDownloaded);
-//        System.out.println("spent time: " + timeSpent);
-
-        LOG.log(Level.INFO, MessageFormat.format("downloaded bytes: {0} for time: {1} by thread: {2}", bytesDownloaded, timeSpentThread, nameThread));
+        LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded -  bytes: {0} for time: {1} by thread: {2}", bytesDownloaded, timeSpentByTask / nanoTimeToSeconds, nameThread, link.toString()));
     }
 
     //strategy for thread balancing
-    private int getTimePauseThread(int timePauseThread, int speedCurrentThread) {
-        int result = timePauseThread;
+    private long getTimePauseThread(long timePauseThread, long speedCurrentThread) {
+        long result = timePauseThread;
 
         //get full sum speed
-        long sumSpeedAllThreads = currentSpeedOfThreads.values().stream().mapToInt(Integer::intValue).sum();
+        long sumSpeedAllThreads = currentSpeedOfThreads.values().stream().mapToLong(Long::longValue).sum();
 
-        if (sumSpeedAllThreads > params.getMaxDownloadSpeed()) {
+        if (sumSpeedAllThreads > parametersOfWork.getMaxDownloadSpeed()) {
             if (speedCurrentThread > this.middleSpeedOneThread) {
-                result += 100 / speedCurrentThread / this.middleSpeedOneThread; //add to sleep time about 100 msec
+                result += 10_000_000; // 100 / this.middleSpeedOneThread / speedCurrentThread  ; //add to sleep time about 100 msec
             } else {
-                result = 0;
+                result -= 10_000_000;
             }
         } else {
-            result = 0;
+            result -= 10_000_000;
         }
         return result < 0 ? 0 : result;
     }
 
+    //visual information about current speed all threads
+    private void speedInfo() {
+        //get full sum speed
+        long sumSpeedAllThreads = currentSpeedOfThreads.values().stream().mapToLong(Long::longValue).sum();
+
+        synchronized (this) {
+
+            statistic.add(MessageFormat.format("speed all: {0}, midspeed: {3}, threads: {1} \n" , sumSpeedAllThreads, currentSpeedOfThreads.toString(), this.parametersOfWork.getMaxDownloadSpeed(), this.middleSpeedOneThread));
+        }
+    }
 
     //atomically add downloaded bytes to counter
     private void addDownloadedBytes(long bytes) {
-        downloadedBytes.getAndAdd(bytes);
+        downloadedBytesSum.getAndAdd(bytes);
     }
 
     private void addSpentTime(long time) {
-        spentTime.getAndAdd(time);
+        spentTimeSummary.getAndAdd(time);
     }
 
 }
