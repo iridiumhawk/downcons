@@ -4,6 +4,7 @@ package cherkasov.com;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +31,6 @@ public class Downloader {
 
     private final List<String> statistic = new ArrayList<>();
 
-/*    public Downloader() {
-    }*/
-
     public AtomicLong getDownloadedBytesSum() {
         return downloadedBytesSum;
     }
@@ -43,7 +41,6 @@ public class Downloader {
         this.middleSpeedOneThread = parametersOfWork.getMaxDownloadSpeed() / parametersOfWork.getNumberOfThreads();
         this.inputBufferOneThread = middleSpeedOneThread / granularityOfManagement; //haw often thread will be managed
     }
-
 
     public void start() {
 
@@ -152,7 +149,9 @@ public class Downloader {
         }
 
         //todo change path for win and linux
-        String fileName = parametersOfWork.getOutputFolder() + "\\" + urlFile.getFileName();
+
+        String fileName =  Paths.get(parametersOfWork.getOutputFolder(), urlFile.getFileName()).toString();
+//        String fileName = parametersOfWork.getOutputFolder() + "\\" + urlFile.getFileName();
 
 
         try (
@@ -196,7 +195,6 @@ public class Downloader {
                 timeSpentByTask += timePauseThread;
             }
 
-
         } catch (IOException e) {
             LOG.log(Level.WARNING, "IOException, " + e.getMessage());
 
@@ -224,12 +222,12 @@ public class Downloader {
 
         if (sumSpeedAllThreads > parametersOfWork.getMaxDownloadSpeed()) {
             if (speedCurrentThread > this.middleSpeedOneThread) {
-                result += 10_000_000; // 100 / this.middleSpeedOneThread / speedCurrentThread  ; //add to sleep time about 100 msec
+                result += 5_000_000; // 100 / this.middleSpeedOneThread / speedCurrentThread  ; //add to sleep time about 100 msec
             } else {
-                result -= 10_000_000;
+                result -= 5_000_000;
             }
         } else {
-            result -= 10_000_000;
+            result -= 5_000_000;
         }
         return result < 0 ? 0 : result;
     }

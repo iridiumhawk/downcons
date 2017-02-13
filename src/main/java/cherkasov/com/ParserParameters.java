@@ -84,13 +84,13 @@ public class ParserParameters {
                 result.append(c);
             }
 
-            if (c == 'k' || c == 'K') {
-                power = 1024;
+            switch (c){
+                case 'k':
+                case 'K':  power = 1024; break;
+                case 'm':
+                case 'M':  power = 1024 * 1024; break;
             }
 
-            if (c == 'm' || c == 'M') {
-                power = 1024 * 1024;
-            }
         }
         return Integer.parseInt(result.toString()) * power;
     }

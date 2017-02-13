@@ -14,8 +14,7 @@ public class ParserLinksTest {
 
     @Before
     public void setUp() throws Exception {
-        parserLinks = new ParserLinks("C:\\java\\downcons\\src\\test\\resources\\links.txt");
-
+        parserLinks = new ParserLinks("links.txt");
     }
 
     @After

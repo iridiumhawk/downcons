@@ -27,6 +27,10 @@ public class ParserLinks {
     }
 
     private void parseLinks(String fileName) {
+        if (!Files.exists(Paths.get(fileName))) {
+            LOG.log(Level.WARNING, "File whit links does not exist ");
+            System.exit(-1);
+        }
 
         try {
             List<String> lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
