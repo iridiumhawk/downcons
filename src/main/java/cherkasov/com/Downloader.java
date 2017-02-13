@@ -132,7 +132,7 @@ public class Downloader {
 //        currentSpeedOfThreads.put(nameThread, 0 );//this.middleSpeedOneThread
 
 //        int inputBuffer = this.inputBufferOneThread;
-        long timePauseThread = 100_000_000; //initial pause 100 msec for eliminate burst download
+        long timePauseThread = nanoTimeToSeconds / middleSpeedOneThread / inputBufferOneThread; //initial pause eliminate burst download
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
         long speedCurrentThread;
@@ -148,18 +148,14 @@ public class Downloader {
             return;
         }
 
-        //todo change path for win and linux
-
-        String fileName =  Paths.get(parametersOfWork.getOutputFolder(), urlFile.getFileName()).toString();
-//        String fileName = parametersOfWork.getOutputFolder() + "\\" + urlFile.getFileName();
-
+        String fileName = Paths.get(parametersOfWork.getOutputFolder(), urlFile.getFileName()).toString();
 
         try (
                 InputStream in = new BufferedInputStream(link.openStream());
                 FileOutputStream fos = new FileOutputStream(fileName)
         ) {
 
-            byte[] buf = new byte[this.inputBufferOneThread];
+            byte[] buf = new byte[inputBufferOneThread];
 
             int numBytesRead;
             while (true) {
@@ -179,17 +175,20 @@ public class Downloader {
 
                 bytesDownloaded += numBytesRead;
 
+                //for msec, delete for nanosec?
                 if (timer <= 0) {
                     timer = 1L;
                 }
 
+
                 //approximately
-                speedCurrentThread = nanoTimeToSeconds / (timer + timePauseThread) * this.inputBufferOneThread;
+                speedCurrentThread = nanoTimeToSeconds / (timer + timePauseThread) * inputBufferOneThread;
 
                 currentSpeedOfThreads.put(nameThread, speedCurrentThread);
 
                 timePauseThread = getTimePauseThread(timePauseThread, speedCurrentThread);
 
+                //todo check behaviour
                 TimeUnit.NANOSECONDS.sleep(timePauseThread);
 
                 timeSpentByTask += timePauseThread;
@@ -222,12 +221,12 @@ public class Downloader {
 
         if (sumSpeedAllThreads > parametersOfWork.getMaxDownloadSpeed()) {
             if (speedCurrentThread > this.middleSpeedOneThread) {
-                result += 5_000_000; // 100 / this.middleSpeedOneThread / speedCurrentThread  ; //add to sleep time about 100 msec
-            } else {
-                result -= 5_000_000;
+                result += 1_000_000; // 100 / this.middleSpeedOneThread / speedCurrentThread  ; //add to sleep time about 100 msec
+            } else if (sumSpeedAllThreads < parametersOfWork.getMaxDownloadSpeed()) {
+                result -= 1_000_000;
             }
-        } else {
-            result -= 5_000_000;
+        } else if (sumSpeedAllThreads < parametersOfWork.getMaxDownloadSpeed()) {
+            result -= 1_000_000;
         }
         return result < 0 ? 0 : result;
     }
@@ -239,7 +238,7 @@ public class Downloader {
 
         synchronized (this) {
 
-            statistic.add(MessageFormat.format("speed all: {0}, midspeed: {3}, threads: {1} \n" , sumSpeedAllThreads, currentSpeedOfThreads.toString(), this.parametersOfWork.getMaxDownloadSpeed(), this.middleSpeedOneThread));
+            statistic.add(MessageFormat.format("speed all: {0}, midspeed: {3}, threads: {1} \n", sumSpeedAllThreads, currentSpeedOfThreads.toString(), this.parametersOfWork.getMaxDownloadSpeed(), this.middleSpeedOneThread));
         }
     }
 
