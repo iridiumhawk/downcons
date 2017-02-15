@@ -5,7 +5,7 @@ import org.junit.Test;
 
 //full test
 public class MainTest {
-    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "500k", "-f", "links.txt", "-o", "output"};
+    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "500000", "-f", "links.txt", "-o", "output"};
 
 
     @Before
@@ -18,34 +18,4 @@ public class MainTest {
         Main.main(argsAllFullCorrect);
     }
 
-  /*  @Test
-    public void testMainArgsWithMissedParam() throws Exception {
-        Main.main(argsWithMissedParam);
-    }
-
-    @Test
-    public void testMainArgsWithMissedParamAtEnd() throws Exception {
-        Main.main(argsWithMissedParamAtEnd);
-    }
-
-    @Test
-    public void testMainArgsWithFileNameEmpty() throws Exception {//todo check Exception
-        Main.main(argsWithFileNameEmpty);
-    }
-
-    @Test
-    public void testMainArgsWithFileNameMissed() throws Exception {//todo check Exception
-        Main.main(argsWithFileNameMissed);
-    }
-
-    @Test
-    public void testMainArgsNotFull() throws Exception {
-        Main.main(argsNotFull);
-    }
-
-    @Test
-    public void testMainArgsWithNoParam() throws Exception {//todo check Exception
-        Main.main(argsWithNoParam);
-    }
-*/
 }
