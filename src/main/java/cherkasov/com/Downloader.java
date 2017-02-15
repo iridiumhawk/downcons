@@ -16,9 +16,11 @@ import java.util.stream.Stream;
 
 import static cherkasov.com.Main.LOG;
 
+
 public class Downloader {
     private final ConcurrentLinkedQueue<DownloadEntity> queueThreadTasks;
-    private final ConcurrentHashMap<String, Long> currentSpeedOfThreads = new ConcurrentHashMap<>(); //for thread speed
+    private final ConcurrentHashMap<String, Long> currentSpeedOfThreads = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, DownloadStatistics> statisticsOfThreads = new ConcurrentHashMap<>();
     private final ParserParameters parametersOfWork;
 
     private volatile AtomicLong downloadedBytesSum = new AtomicLong(0L);
@@ -28,6 +30,7 @@ public class Downloader {
     private final int inputBufferOneThread;
     private final int nanoTimeToSeconds = 1_000_000_000;
     private final int granularityOfManagement = 10;
+    private long startTime;
 
     private final List<String> statistic = new ArrayList<>();
 
@@ -113,6 +116,8 @@ public class Downloader {
             service.execute(runner);
         }
 
+        startTime = System.currentTimeMillis();
+
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -136,6 +141,11 @@ public class Downloader {
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
         long speedCurrentThread;
+
+        DownloadStatistics statisticThread = statisticsOfThreads.getOrDefault(nameThread, new DownloadStatistics());
+
+        statisticThread.bufferSize = inputBufferOneThread;
+
 
 //        URL link = new URL("http://.txt");
         URL link;
@@ -161,6 +171,7 @@ public class Downloader {
             while (true) {
                 Long timer = System.nanoTime();
 
+                //todo change method of getting buffer
                 numBytesRead = in.read(buf);
 
                 if (numBytesRead == -1) {
@@ -188,10 +199,19 @@ public class Downloader {
 
                 timePauseThread = getTimePauseThread(timePauseThread, speedCurrentThread);
 
+                statisticThread.speedCounted = speedCurrentThread;
+                statisticThread.timeOfGettingBuffer = timer;
+                statisticThread.timeOutSleep = timePauseThread;
+
+                statisticsOfThreads.put(nameThread,statisticThread);
+
                 //todo check behaviour
                 TimeUnit.NANOSECONDS.sleep(timePauseThread);
 
                 timeSpentByTask += timePauseThread;
+
+                addDownloadedBytes(numBytesRead);
+
             }
 
         } catch (IOException e) {
@@ -202,12 +222,14 @@ public class Downloader {
         }
 
         //on exit thread write downloaded bytes
-        addDownloadedBytes(bytesDownloaded);
+//        addDownloadedBytes(bytesDownloaded);
 
         //sum time of all threads, it will greater than time work for program
         addSpentTime(timeSpentByTask);
 
         currentSpeedOfThreads.put(nameThread, 0L);
+        statisticsOfThreads.put(nameThread,new DownloadStatistics());
+
 
         LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded -  bytes: {0} for time: {1} by thread: {2}", bytesDownloaded, timeSpentByTask / nanoTimeToSeconds, nameThread, link.toString()));
     }
@@ -234,11 +256,14 @@ public class Downloader {
     //visual information about current speed all threads
     private void speedInfo() {
         //get full sum speed
-        long sumSpeedAllThreads = currentSpeedOfThreads.values().stream().mapToLong(Long::longValue).sum();
+//        long sumSpeedAllThreads = currentSpeedOfThreads.values().stream().mapToLong(Long::longValue).sum();
+        long sumSpeedAllThreads = downloadedBytesSum.longValue() / (System.currentTimeMillis() - startTime) * 1000;
 
         synchronized (this) {
 
-            statistic.add(MessageFormat.format("speed all: {0}, midspeed: {3}, threads: {1} \n", sumSpeedAllThreads, currentSpeedOfThreads.toString(), this.parametersOfWork.getMaxDownloadSpeed(), this.middleSpeedOneThread));
+            statistic.add(MessageFormat.format("speed all: {0}, threads: {1} \n", sumSpeedAllThreads, statisticsOfThreads.toString() ));
+
+//            statistic.add(MessageFormat.format("speed all: {0}, midspeed: {3}, threads: {1} \n", sumSpeedAllThreads, currentSpeedOfThreads.toString(), this.parametersOfWork.getMaxDownloadSpeed(), this.middleSpeedOneThread));
         }
     }
 
@@ -250,6 +275,24 @@ public class Downloader {
     private void addSpentTime(long time) {
         spentTimeSummary.getAndAdd(time);
     }
+
+    class DownloadStatistics{
+        long bufferSize;
+        long timeOfGettingBuffer;
+        long timeOutSleep;
+        long speedCounted;
+
+        @Override
+        public String toString() {
+            return "Stat{" +
+                    "buff=" + bufferSize +
+                    ", time=" + timeOfGettingBuffer +
+                    ", sleep=" + timeOutSleep +
+                    ", speed=" + speedCounted +
+                    '}';
+        }
+    }
+
 
 }
 

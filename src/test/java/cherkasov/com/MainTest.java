@@ -5,7 +5,7 @@ import org.junit.Test;
 
 //full test
 public class MainTest {
-    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "100k", "-f", "links.txt", "-o", "output"};
+    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "500k", "-f", "links.txt", "-o", "output"};
 
 
     @Before
