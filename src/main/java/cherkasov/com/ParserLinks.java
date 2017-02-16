@@ -3,7 +3,6 @@ package cherkasov.com;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -11,11 +10,11 @@ import java.util.logging.Level;
 
 import static cherkasov.com.Main.LOG;
 
-//parsing file with links
+//parsing file with links and put them in tasks queue
 public class ParserLinks {
-    private final ConcurrentLinkedQueue<DownloadEntity> queueTasks = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
 
-    public ConcurrentLinkedQueue<DownloadEntity> getQueueTasks() {
+    public ConcurrentLinkedQueue<TaskEntity> getQueueTasks() {
         return queueTasks;
     }
 
@@ -23,10 +22,11 @@ public class ParserLinks {
 
         parseLinks(fileName);
 
-        LOG.log(Level.INFO, "parsing file with links done");
+        LOG.log(Level.INFO, "Parsing file with links done");
     }
 
     private void parseLinks(String fileName) {
+
         if (!Files.exists(Paths.get(fileName))) {
             LOG.log(Level.WARNING, "File whit links does not exist ");
             System.exit(-1);
@@ -41,26 +41,23 @@ public class ParserLinks {
                     continue;
                 }
 
-                char firstInLine = line.charAt(0);
-                //comment line
-                if (firstInLine == '#') {
+                char firstCharInLine = line.charAt(0);
+
+                //comment line, go to next
+                if (firstCharInLine == '#') {
                     continue;
                 }
 
-//                System.out.println(line);
+                String[] urlAndFileName = line.trim().split(" ");
 
-                String[] urlName = line.trim().split(" "); //trim?
-                if (urlName.length >= 2) {
-                    queueTasks.add(new DownloadEntity(urlName[0], urlName[1]));
+                //add tasks to concurrency queue, from which threads will take url for download
+                if (urlAndFileName.length >= 2) {
+                    queueTasks.add(new TaskEntity(urlAndFileName[0], urlAndFileName[1]));
                 }
-
-//                LOG.log(Level.INFO, urlName[0] +" : "+ urlName[1]);
             }
-
         } catch (IOException e) {
             LOG.log(Level.WARNING, e.getMessage());
         }
-
     }
 }
 

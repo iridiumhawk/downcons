@@ -11,12 +11,11 @@ import java.nio.file.Paths;
 
 //full test
 public class MainTest {
-    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "100000", "-f", "links.txt", "-o", "output"};
+    private final String[] argsAllFullCorrect = {"-n", "4", "-l", "400000", "-f", "links.txt", "-o", "output"};
 
 
     @Before
     public void initTest(){
-        new Main();
     }
 
     @Test
@@ -25,7 +24,7 @@ public class MainTest {
     }
 
 
-    @Test
+    /*@Test
     @Ignore
     public void saveFile(){
         long time = 0;
@@ -71,6 +70,6 @@ public class MainTest {
 
         }
 
-    }
+    }*/
 
 }

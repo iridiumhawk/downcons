@@ -23,9 +23,10 @@ public class Manager {
         //parsing links file
         ParserLinks parserLinks = new ParserLinks(parserParameters.getFileNameWithLinks());
 
-        //check and create output folder
+        //get output folder
         Path dir = Paths.get(parserParameters.getOutputFolder());
 
+        //check for exist and create output folder
         if (!Files.isDirectory(dir)) {
             try {
                 Files.createDirectory(dir);
@@ -34,12 +35,11 @@ public class Manager {
             }
         }
 
-        //create concurrency queue for tasks, from which threads will take url for download
+        //create downloader instance
         Downloader downloader = new Downloader(parserLinks.getQueueTasks(), parserParameters);
 
         downloader.start();
 
         return downloader.getDownloadedBytesSum().get();
     }
-
 }

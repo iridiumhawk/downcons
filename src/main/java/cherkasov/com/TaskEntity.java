@@ -1,10 +1,11 @@
 package cherkasov.com;
 
-class DownloadEntity{
+//task with url and file
+class TaskEntity {
     private final String url;
     private final String fileName;
 
-    public DownloadEntity(String url, String fileName) {
+    public TaskEntity(String url, String fileName) {
         this.url = url;
         this.fileName = fileName;
     }
@@ -17,22 +18,15 @@ class DownloadEntity{
         return fileName;
     }
 
-
+    //for unit testing
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DownloadEntity that = (DownloadEntity) o;
+        TaskEntity that = (TaskEntity) o;
 
         if (!getUrl().equals(that.getUrl())) return false;
         return getFileName().equals(that.getFileName());
     }
-/*
-    @Override
-    public int hashCode() {
-        int result = getUrl().hashCode();
-        result = 31 * result + getFileName().hashCode();
-        return result;
-    }*/
 }

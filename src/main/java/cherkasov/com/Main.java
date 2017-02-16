@@ -27,41 +27,40 @@ import java.util.logging.*;
 
 public class Main {
 
-    final static Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());//Logger.getLogger();
+    final static Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());
 
     private static Long workingTime = 0L;
 
-    public Main() {
+/*    public Main() {
         workingTime = 0L;
 
         LOG.log(Level.INFO, "Main init");
-    }
+    }*/
 
     public static void main(String[] args) {
+        LOG.setLevel(Level.OFF);
 
-        LOG.log(Level.INFO, "========================================================");
-        LOG.log(Level.INFO, "Program started");
+        LOG.log(Level.INFO, "Program start");
 
-//        setWorkingTime();
         workingTime = System.currentTimeMillis();
+
         Manager manager = new Manager(args);
 
-        //todo calculate bytes
         Long downloadedBytes = manager.execute();
 
-//        setWorkingTime();
         workingTime = System.currentTimeMillis() - workingTime;
 
-        System.out.println("Time spent for all: " + workingTime / 1000 + " seconds");
+        System.out.println(MessageFormat.format(
+                "Time spent for all tasks: {0} seconds",
+                workingTime / 1000));
 
-        System.out.println(MessageFormat.format("Total downloaded: {0} bytes ({1} Megabytes)", downloadedBytes, downloadedBytes / 1024 / 1024));
+        System.out.println(MessageFormat.format(
+                "Total downloaded: {0} byte ({1} MegaByte), average speed: {2} byte/sec",
+                downloadedBytes,
+                downloadedBytes / 1024 / 1024,
+                downloadedBytes / workingTime / 1000)); // check = 0?
 
         LOG.log(Level.INFO, "Program ended");
     }
-
-    //count time of program working time
-/*    private static void setWorkingTime() {
-        workingTime = System.currentTimeMillis() - workingTime;
-    }*/
 }
 

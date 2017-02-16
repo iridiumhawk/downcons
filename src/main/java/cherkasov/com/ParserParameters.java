@@ -1,11 +1,10 @@
 package cherkasov.com;
 
-
 import java.util.logging.Level;
 
 import static cherkasov.com.Main.LOG;
 
-//parsing input parameters
+//parsing command line parameters
 public class ParserParameters {
 
     //default values
@@ -13,12 +12,18 @@ public class ParserParameters {
     private int maxDownloadSpeed = 1000000; //bytes in second
     private String fileNameWithLinks = "links.txt";
     private String outputFolder = "download";
+    private boolean debug = true;
 
     //command line keys
     private final String NUMBER_OF_THREADS_KEY = "-n";
     private final String MAX_DOWNLOAD_SPEED_KEY = "-l";
     private final String FILE_NAME_WITH_LINKS_KEY = "-f";
     private final String OUTPUT_FOLDER_KEY = "-o";
+    private final String DEBUG_KEY = "-d";
+
+    public boolean isDebug() {
+        return debug;
+    }
 
     public int getNumberOfThreads() {
         return numberOfThreads;
@@ -63,18 +68,20 @@ public class ParserParameters {
 
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
-                LOG.log(Level.WARNING, "index of param out of bounds");
+                LOG.log(Level.WARNING, "Index of parameter out of array bounds");
             }
         }
-        LOG.log(Level.INFO, "parsing args was done");
+        LOG.log(Level.INFO, "Parsing command line parameters was done");
     }
 
+    //todo check for wrong strings
     private int parseIntoNumber(String arg) {
 
-        StringBuilder result = new StringBuilder("0");
-        int power = 1;
-
         if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') return 0;
+
+        StringBuilder result = new StringBuilder("0");
+
+        int power = 1;
 
         for (int i = 0; i < arg.length(); i++) {
 
@@ -90,7 +97,6 @@ public class ParserParameters {
                 case 'm':
                 case 'M':  power = 1024 * 1024; break;
             }
-
         }
         return Integer.parseInt(result.toString()) * power;
     }

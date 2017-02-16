@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Created by hawk on 08.02.2017.
  */
 public class DownloaderTest {
-    private ConcurrentLinkedQueue<DownloadEntity> queueTasks;
+    private ConcurrentLinkedQueue<TaskEntity> queueTasks;
     private ParserParameters parserParameters;
 
     @Before
