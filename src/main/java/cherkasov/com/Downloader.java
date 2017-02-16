@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -28,12 +29,13 @@ public class Downloader {
     private final ParserParameters parametersOfWork;
 
     private volatile AtomicLong downloadedBytesSum = new AtomicLong(0L);
+    private volatile AtomicLong downloadBucket = new AtomicLong(0L);
     private volatile AtomicLong spentTimeSummary = new AtomicLong(0L);
 
     private final int middleSpeedOneThread;
     private final int inputBufferOneThread;
     private final int nanoTimeToSeconds = 1_000_000_000;
-    private final int granularityOfManagement = 20;
+    private final int granularityOfManagement = 10;
     //del
     private long startTime;
 
@@ -54,6 +56,7 @@ public class Downloader {
 
         threadMonitor();
         threadSpeedMonitor();
+        threadBucketFill();
 
         threadsExecutor(parametersOfWork.getNumberOfThreads());
 
@@ -79,6 +82,41 @@ public class Downloader {
         }
     }
 
+    //Token Bucket Algorithm
+    private void threadBucketFill() {
+
+        Thread threadMonitor = new Thread(() -> {
+
+            while (true) {
+                try {
+                    increaseBucket(parametersOfWork.getMaxDownloadSpeed() / 10);
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                }
+            }
+        });
+
+        threadMonitor.start();
+    }
+
+    private void increaseBucket(long updateValue) {
+
+            downloadBucket.accumulateAndGet(updateValue,(current,given)->{ long result = current+given; if (result > parametersOfWork.getMaxDownloadSpeed()) { result = parametersOfWork.getMaxDownloadSpeed();} return result;});
+    }
+
+    private synchronized boolean checkBucket(long updateValue) {
+
+        if (downloadBucket.get() < updateValue) {
+            return false;
+        }
+
+        downloadBucket.accumulateAndGet(updateValue,(current,given)->current - given);
+
+        return true;
+    }
+
+
+
     //for testing
     private void threadSpeedMonitor() {
 
@@ -91,13 +129,13 @@ public class Downloader {
                 } catch (InterruptedException e) {
                 }
 
-                System.out.println(downloadedBytesSum.longValue() - previousBytes);
+                System.out.println(downloadedBytesSum.longValue() - previousBytes+" : "+ downloadBucket.get());
 
                 previousBytes = downloadedBytesSum.longValue();
             }
         });
 
-        threadMonitor.setDaemon(true);
+//        threadMonitor.setDaemon(true);
         threadMonitor.start();
     }
 
@@ -156,7 +194,8 @@ public class Downloader {
         LOG.log(Level.INFO, MessageFormat.format("Time spent summary for all threads: {0} seconds", this.spentTimeSummary.get() / nanoTimeToSeconds));
     }
 
-    //todo private
+    //realize new model - bucket
+
     private void downloadFile(DownloadEntity urlFile, String nameThread) {
         if (urlFile == null) return;
 
@@ -198,7 +237,8 @@ public class Downloader {
         long speedCurrentThread;
 
         // opens input stream from the HTTP connection
-        try (ReadableByteChannel rbc = Channels.newChannel(httpConn.getInputStream());
+        try (
+                ReadableByteChannel rbc = Channels.newChannel(httpConn.getInputStream());
 //                InputStream in = httpConn.getInputStream();
 //                InputStream in = new BufferedInputStream(link.openStream());
              FileOutputStream fos = new FileOutputStream(fileName)
@@ -210,53 +250,59 @@ public class Downloader {
 //            ByteBuffer dst = ByteBuffer.wrap(buf);
 
             int numBytesRead = 0;
-            while (true) {
-                Long timer = System.nanoTime();
+            Random randomTimeOut = new Random();
 
-                //todo change method of getting buffer
+            while (true) {
+
+            //Token Bucket Algorithm
+                if (checkBucket(inputBufferOneThread)) {// true
+
+                    Long timer = System.nanoTime();
+
+                    //todo change method of getting buffer
 //                numBytesRead = in.read(buf);
 //                numBytesRead = rbc.read(dst);
 
-                numBytesRead = (int) fos.getChannel().transferFrom(rbc, bytesDownloaded, inputBufferOneThread);
+                    numBytesRead = (int) fos.getChannel().transferFrom(rbc, bytesDownloaded, inputBufferOneThread);
 //                fos.flush();
 
-                if (numBytesRead == -1 || bytesDownloaded == contentLength) {
-                    break;
-                }
+                    if (numBytesRead == -1 || bytesDownloaded == contentLength) {
+                        break;
+                    }
 
-                timer = System.nanoTime() - timer;
+                    timer = System.nanoTime() - timer;
 
-                timeSpentByTask += timer;
+                    timeSpentByTask += timer;
 
 //                fos.write(buf, 0, numBytesRead);
-                fos.flush();
+                    fos.flush();
 
-                bytesDownloaded += numBytesRead;
+                    bytesDownloaded += numBytesRead;
 
-                //for msec, delete for nanosec?
-//                if (timer <= 0) {
-//                    timer = 1L;
-//                }
 
-                //approximately
-                speedCurrentThread = nanoTimeToSeconds / (timer + timePauseThread) * inputBufferOneThread;
+                    //approximately
+                    speedCurrentThread = nanoTimeToSeconds / (timer + timePauseThread) * inputBufferOneThread;
 
-                currentSpeedOfThreads.put(nameThread, speedCurrentThread);
+                    currentSpeedOfThreads.put(nameThread, speedCurrentThread);
 
-                timePauseThread = getTimePauseThread(timePauseThread, speedCurrentThread);
+                    timePauseThread = getTimePauseThread(timePauseThread, speedCurrentThread);
 
-                statisticThread.speedCounted = speedCurrentThread;
-                statisticThread.timeOfGettingBuffer = timer;
-                statisticThread.timeOutSleep = timePauseThread;
+                    statisticThread.speedCounted = speedCurrentThread;
+                    statisticThread.timeOfGettingBuffer = timer;
+                    statisticThread.timeOutSleep = timePauseThread;
 
-                statisticsOfThreads.put(nameThread, statisticThread);
+                    statisticsOfThreads.put(nameThread, statisticThread);
 
-                //todo check behaviour
-                TimeUnit.NANOSECONDS.sleep(timePauseThread);
+                    addDownloadedBytes(numBytesRead);
 
-                timeSpentByTask += timePauseThread;
+                    timeSpentByTask += timePauseThread;//del
+                }
+                //todo random timeout?
+                TimeUnit.MILLISECONDS.sleep(randomTimeOut.nextInt(10) + 1);
 
-                addDownloadedBytes(numBytesRead);
+
+
+
 
             }
 
