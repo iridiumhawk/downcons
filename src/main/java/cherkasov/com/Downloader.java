@@ -8,7 +8,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -62,7 +61,6 @@ public class Downloader {
     }
 
 
-
     public void start() {
 
 //        debugThreads.threadMonitor();
@@ -84,6 +82,7 @@ public class Downloader {
 
             while (true) {
                 try {
+                    //todo implement various strategy of filling
                     increaseBucket(parametersOfWork.getMaxDownloadSpeed() / 10);
                     TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
@@ -105,7 +104,7 @@ public class Downloader {
         });
     }
 
-    private synchronized boolean checkBucket(long updateValue) {
+    private synchronized boolean checkAndDecreaseBucket(long updateValue) {
 
         if (downloadBucket.get() < updateValue) {
             return false;
@@ -137,6 +136,7 @@ public class Downloader {
         };
 
         ExecutorService service = Executors.newFixedThreadPool(threadCounter);
+
         LOG.log(Level.INFO, "Thread pool start");
 
         for (int i = 0; i < threadCounter; i++) {
@@ -149,79 +149,75 @@ public class Downloader {
             LOG.log(Level.WARNING, "InterruptedException, " + e.getMessage());
         }
 
-        LOG.log(Level.INFO, "Download was done");
-        LOG.log(Level.INFO, MessageFormat.format("Time spent summary for all threads: {0} seconds", spentTimeSummary.get() / convertNanoToSeconds));
+        LOG.log(Level.INFO, MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds", spentTimeSummary.get() / convertNanoToSeconds));
     }
 
     private void downloadFile(TaskEntity urlFile, String nameThread) {
         if (urlFile == null) return;
-
-        LOG.log(Level.INFO, "Download url: " + urlFile.getUrl() + " start");
-
 
 //        DownloadStatistics statisticThread = statisticsOfThreads.getOrDefault(nameThread, new DownloadStatistics());
 
 //        statisticThread.bufferSize = inputBufferOneThread;
 
         URL link;
-        HttpURLConnection httpConn;
+        HttpURLConnection httpURLConnection;
 
         try {
             link = new URL(urlFile.getUrl());
-            httpConn = (HttpURLConnection) link.openConnection();
-            int responseCode = httpConn.getResponseCode();
+            httpURLConnection = (HttpURLConnection) link.openConnection();
+            int responseCode = httpURLConnection.getResponseCode();
 
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 LOG.log(Level.WARNING, "Response Code, " + responseCode);
                 return;
             }
-
         } catch (IOException e) {
             LOG.log(Level.WARNING, "URLException Exception, " + e.getMessage());
             return;
         }
 
+        LOG.log(Level.INFO, "Download url: " + urlFile.getUrl() + " start");
+
         String fileName = Paths.get(parametersOfWork.getOutputFolder(), urlFile.getFileName()).toString();
 
-//        String disposition = httpConn.getHeaderField("Content-Disposition");
-//        String contentType = httpConn.getContentType();
+//        String disposition = httpURLConnection.getHeaderField("Content-Disposition");
+//        String contentType = httpURLConnection.getContentType();
 
-        int contentLength = httpConn.getContentLength();
+        int contentLength = httpURLConnection.getContentLength();
         long bytesDownloaded = 0;
+        long timeSpentByTask = 0;
 
 //        long timePauseThread = 10; //convertNanoToSeconds / middleSpeedOneThread / inputBufferOneThread; //initial pause eliminate burst download
-        long timeSpentByTask = 0;
 //        long speedCurrentThread;
 
+        //todo implement various strategy of download from internet
         // opens input stream from the HTTP connection
         try (
-                ReadableByteChannel rbc = Channels.newChannel(httpConn.getInputStream());
-//                InputStream in = httpConn.getInputStream();
-//                InputStream in = new BufferedInputStream(link.openStream());
+                ReadableByteChannel rbc = Channels.newChannel(httpURLConnection.getInputStream());
                 FileOutputStream fos = new FileOutputStream(fileName)
         ) {
-
+//                InputStream in = httpURLConnection.getInputStream();
+//                InputStream in = new BufferedInputStream(link.openStream());
 //            byte[] buf = new byte[inputBufferOneThread];
 //            ByteBuffer dst = ByteBuffer.wrap(buf);
 
             int numBytesRead;
-            Random randomTimeOut = new Random();
 
             while (true) {
 
-                //Token Bucket Algorithm
-                if (checkBucket(inputBufferOneThread)) {// true
+                //use Token Bucket Algorithm
+                if (checkAndDecreaseBucket(inputBufferOneThread)) {// true
 
                     Long timer = System.nanoTime();
 
-                    //todo change method of getting buffer
 //                numBytesRead = in.read(buf);
 //                numBytesRead = rbc.read(dst);
 
                     numBytesRead = (int) fos.getChannel().transferFrom(rbc, bytesDownloaded, inputBufferOneThread);
-//                fos.flush();
 
-                    if (numBytesRead == -1 || bytesDownloaded == contentLength) {//dont work without contentLength
+                    //don`t work without checking contentLength
+                    //todo check for correct downloading file (length, md5?)
+                    if (numBytesRead == -1 || bytesDownloaded == contentLength) {
                         break;
                     }
 
@@ -253,22 +249,14 @@ public class Downloader {
 
 
                 }
-                //todo random timeout?
-                TimeUnit.MILLISECONDS.sleep(randomTimeOut.nextInt(10) + 1);
-
+                //todo random timeout? //randomTimeOut.nextInt(10) +
+                TimeUnit.MILLISECONDS.sleep( 1);
             }
-
-        } catch (IOException e) {
+        } catch (Exception e ) {
             LOG.log(Level.WARNING, "IOException, " + e.getMessage());
-
-        } catch (InterruptedException e) {
-            LOG.log(Level.WARNING, "InterruptedException, " + e.getMessage());
         }
 
-        httpConn.disconnect();
-
-        //on exit thread write downloaded bytes
-//        addDownloadedBytes(bytesDownloaded);
+        httpURLConnection.disconnect();
 
         //sum time of all threads, it will greater than time work for program
         addSpentTime(timeSpentByTask);

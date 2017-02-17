@@ -12,7 +12,7 @@ public class DebugThreads {
     private final ConcurrentHashMap<String, Long> currentSpeedOfThreads = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, DownloadStatistics> statisticsOfThreads = new ConcurrentHashMap<>();
     private final List<String> statistic = new ArrayList<>();
-    private boolean debugState = false;
+    private final boolean debugState;
     private final Downloader downloader;
 
     public DebugThreads(boolean debugState, Downloader downloader) {

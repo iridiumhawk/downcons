@@ -27,18 +27,12 @@ import java.util.logging.*;
 
 public class Main {
 
-    final static Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());
+    static final Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());
 
     private static Long workingTime = 0L;
 
-/*    public Main() {
-        workingTime = 0L;
-
-        LOG.log(Level.INFO, "Main init");
-    }*/
-
     public static void main(String[] args) {
-        LOG.setLevel(Level.OFF);
+        LOG.setLevel(Level.INFO);
 
         LOG.log(Level.INFO, "Program start");
 
@@ -58,7 +52,7 @@ public class Main {
                 "Total downloaded: {0} byte ({1} MegaByte), average speed: {2} byte/sec",
                 downloadedBytes,
                 downloadedBytes / 1024 / 1024,
-                downloadedBytes / workingTime / 1000)); // check = 0?
+                downloadedBytes / (workingTime / 1000)));
 
         LOG.log(Level.INFO, "Program ended");
     }
