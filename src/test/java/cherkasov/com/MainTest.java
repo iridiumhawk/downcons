@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 //full test
 public class MainTest {
-    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "1000000", "-f", "links.txt", "-o", "output"};
+    private final String[] argsAllFullCorrect = {"-n", "5", "-l", "500000", "-f", "links.txt", "-o", "output"};
 
 
     @Before

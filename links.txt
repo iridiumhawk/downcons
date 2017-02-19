@@ -16,3 +16,4 @@ http://innofiles.com/soft/neosetup/NeoSetup_Updater.exe NeoSetup_Updater.exe
 http://innofiles.com/soft/cleaner/advanced_disk_cleaner.exe advanced_disk_cleaner.exe
 http://www.innovative-sol.com/soft/taskmanager/advanced_task_manager.exe advanced_task_manager.exe
 #http://libreoffice-mirror.rbc.ru/pub/libreoffice/libreoffice/stable/5.2.5/win/x86/LibreOffice_5.2.5_Win_x86.msi LibreOffice_5.2.5_Win_x86.msi
+#http://download.dopdf.com/download/setup/dopdf-full.exe dopdf-full.exe

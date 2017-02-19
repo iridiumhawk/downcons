@@ -18,7 +18,7 @@ import static cherkasov.com.Main.LOG;
 public class Downloader {
     private final ConcurrentLinkedQueue<TaskEntity> queueThreadTasks;
     private final ParserParameters parametersOfWork;
-    private  final DebugThreads debugThreads;
+    private final DebugThreads debugThreads;
 
     private volatile AtomicLong downloadedBytesSum = new AtomicLong(0L);
 
@@ -30,7 +30,6 @@ public class Downloader {
     private final int inputBufferOneThread;
     private final int convertNanoToSeconds = 1_000_000_000;
     private final int granularityOfManagement = 10;
-
 
 
     public Downloader(ConcurrentLinkedQueue<TaskEntity> queueTasks, ParserParameters parserParameters) {
@@ -186,6 +185,7 @@ public class Downloader {
         int contentLength = httpURLConnection.getContentLength();
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
+        long sleepTimeNanoSec = 1_000_000;
 
 //        long timePauseThread = 10; //convertNanoToSeconds / middleSpeedOneThread / inputBufferOneThread; //initial pause eliminate burst download
 //        long speedCurrentThread;
@@ -232,7 +232,6 @@ public class Downloader {
 
                     addDownloadedBytes(numBytesRead);
 
-//                    timeSpentByTask += timePauseThread;//del
 
                     //approximately
 /*                    speedCurrentThread = convertNanoToSeconds / (timer + timePauseThread) * inputBufferOneThread;
@@ -250,15 +249,16 @@ public class Downloader {
 
                 }
                 //todo random timeout? //randomTimeOut.nextInt(10) +
-                TimeUnit.MILLISECONDS.sleep( 1);
+                TimeUnit.NANOSECONDS.sleep(sleepTimeNanoSec);
+                timeSpentByTask += sleepTimeNanoSec;
             }
-        } catch (Exception e ) {
+        } catch (Exception e) {
             LOG.log(Level.WARNING, "IOException, " + e.getMessage());
         }
 
         httpURLConnection.disconnect();
 
-        //sum time of all threads, it will greater than time work for program
+        //time of each threads, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
 
 //        currentSpeedOfThreads.put(nameThread, 0L);
