@@ -1,6 +1,9 @@
 package cherkasov.com;
 
 
+import cherkasov.com.source.Connection;
+import cherkasov.com.source.HttpConnection;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,56 +23,59 @@ public class Downloader {
     private final ParserParameters parametersOfWork;
     private final DebugThreads debugThreads;
 
-    private volatile AtomicLong downloadedBytesSum = new AtomicLong(0L);
-
-
-    private volatile AtomicLong downloadBucket = new AtomicLong(0L);
+    private volatile AtomicLong downloadedBytesSummary = new AtomicLong(0L);
+    private volatile AtomicLong bucketCommon = new AtomicLong(0L);
     private volatile AtomicLong spentTimeSummary = new AtomicLong(0L);
 
     private final int middleSpeedOneThread;
     private final int inputBufferOneThread;
-    private final int convertNanoToSeconds = 1_000_000_000;
-    private final int granularityOfManagement = 10;
+    private final int CONVERT_NANO_TO_SECONDS = 1_000_000_000;
+    //how often thread will be managed (request buffer from server), times in second
+    private final int GRANULARITY_OF_MANAGEMENT = 10;
 
 
     public Downloader(ConcurrentLinkedQueue<TaskEntity> queueTasks, ParserParameters parserParameters) {
         this.queueThreadTasks = queueTasks;
         this.parametersOfWork = parserParameters;
         this.middleSpeedOneThread = parametersOfWork.getMaxDownloadSpeed() / parametersOfWork.getNumberOfThreads();
-        this.inputBufferOneThread = middleSpeedOneThread / granularityOfManagement; //how often thread will be managed
+        //buffer for one request
+        this.inputBufferOneThread = middleSpeedOneThread / GRANULARITY_OF_MANAGEMENT;
 
         this.debugThreads = new DebugThreads(parametersOfWork.isDebug(), this);
     }
 
-    public AtomicLong getDownloadBucket() {
-        return downloadBucket;
+    public AtomicLong getBucketCommon() {
+        return bucketCommon;
     }
 
-    public AtomicLong getDownloadedBytesSum() {
-        return downloadedBytesSum;
+    public AtomicLong getDownloadedBytesSummary() {
+        return downloadedBytesSummary;
     }
 
     //atomically add downloaded bytes to counter
     private void addDownloadedBytes(long bytes) {
-        downloadedBytesSum.getAndAdd(bytes);
+        downloadedBytesSummary.getAndAdd(bytes);
     }
 
-    //atomically add tine spent by thread to counter
+    //atomically add time spent by thread to counter
     private void addSpentTime(long time) {
         spentTimeSummary.getAndAdd(time);
     }
 
 
     public void start() {
-
+//run debug
 //        debugThreads.threadMonitor();
 
         debugThreads.threadSpeedMonitor();
 
+        //fill bucket for first use
         threadBucketFill();
 
+        //start threads
         threadsExecutor(parametersOfWork.getNumberOfThreads());
 
+//save debug data
 //       debugThreads. saveStatistics();
     }
 
@@ -79,12 +85,19 @@ public class Downloader {
 
         Thread threadMonitor = new Thread(() -> {
 
+            //todo implement various strategy of filling
+            //milliseconds
+            final long timeToSleepBeforeFill = 100;
+
+            final long valueOfFilling =  parametersOfWork.getMaxDownloadSpeed() / (1000 / timeToSleepBeforeFill);
+
             while (true) {
                 try {
-                    //todo implement various strategy of filling
-                    increaseBucket(parametersOfWork.getMaxDownloadSpeed() / 10);
-                    TimeUnit.MILLISECONDS.sleep(100);
+
+                    increaseBucket(valueOfFilling);
+                    TimeUnit.MILLISECONDS.sleep(timeToSleepBeforeFill);
                 } catch (InterruptedException e) {
+                    LOG.log(Level.WARNING, "threadBucketFill InterruptedException");
                 }
             }
         });
@@ -92,9 +105,9 @@ public class Downloader {
         threadMonitor.start();
     }
 
-    private void increaseBucket(long updateValue) {
+    private void increaseBucket(final long updateValue) {
 
-        downloadBucket.accumulateAndGet(updateValue, (current, given) -> {
+        bucketCommon.accumulateAndGet(updateValue, (current, given) -> {
             long result = current + given;
             if (result > parametersOfWork.getMaxDownloadSpeed()) {
                 result = parametersOfWork.getMaxDownloadSpeed();
@@ -103,19 +116,19 @@ public class Downloader {
         });
     }
 
-    private synchronized boolean checkAndDecreaseBucket(long updateValue) {
+    private synchronized boolean checkAndDecreaseBucket(final long updateValue) {
 
-        if (downloadBucket.get() < updateValue) {
+        if (bucketCommon.get() < updateValue) {
             return false;
         }
 
-        downloadBucket.accumulateAndGet(updateValue, (current, given) -> current - given);
+        bucketCommon.accumulateAndGet(updateValue, (current, given) -> current - given);
 
         return true;
     }
 
     //launch all threads
-    private void threadsExecutor(int threadCounter) {
+    private void threadsExecutor(final int threadCounter) {
 
         final CountDownLatch latch = new CountDownLatch(threadCounter);
 
@@ -123,7 +136,8 @@ public class Downloader {
 
             while (!queueThreadTasks.isEmpty()) {
                 try {
-                    downloadFile(queueThreadTasks.poll(), Thread.currentThread().getName());
+                    TaskEntity task = queueThreadTasks.poll();
+                    downloadFile(task, new HttpConnection(task),Thread.currentThread().getName());
 
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Download Exception, " + e.getMessage());
@@ -136,7 +150,7 @@ public class Downloader {
 
         ExecutorService service = Executors.newFixedThreadPool(threadCounter);
 
-        LOG.log(Level.INFO, "Thread pool start");
+        LOG.log(Level.INFO, "Thread pool started");
 
         for (int i = 0; i < threadCounter; i++) {
             service.execute(runner);
@@ -148,30 +162,13 @@ public class Downloader {
             LOG.log(Level.WARNING, "InterruptedException, " + e.getMessage());
         }
 
-        LOG.log(Level.INFO, MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds", spentTimeSummary.get() / convertNanoToSeconds));
+        LOG.log(Level.INFO, MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds", spentTimeSummary.get() / CONVERT_NANO_TO_SECONDS));
     }
 
-    private void downloadFile(TaskEntity urlFile, String nameThread) {
-        if (urlFile == null) return;
+    private void downloadFile(TaskEntity urlFile, Connection connection, String nameThread) {
 
-//        DownloadStatistics statisticThread = statisticsOfThreads.getOrDefault(nameThread, new DownloadStatistics());
-
-//        statisticThread.bufferSize = inputBufferOneThread;
-
-        URL link;
-        HttpURLConnection httpURLConnection;
-
-        try {
-            link = new URL(urlFile.getUrl());
-            httpURLConnection = (HttpURLConnection) link.openConnection();
-            int responseCode = httpURLConnection.getResponseCode();
-
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                LOG.log(Level.WARNING, "Response Code, " + responseCode);
-                return;
-            }
-        } catch (IOException e) {
-            LOG.log(Level.WARNING, "URLException Exception, " + e.getMessage());
+        if (!connection.isConnected()) {
+            LOG.log(Level.WARNING, "Don't have connection!");
             return;
         }
 
@@ -182,40 +179,32 @@ public class Downloader {
 //        String disposition = httpURLConnection.getHeaderField("Content-Disposition");
 //        String contentType = httpURLConnection.getContentType();
 
-        int contentLength = httpURLConnection.getContentLength();
+        final long contentLength = connection.getContentLength();
+        final long sleepTimeNanoSec = 1_000_000;
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
-        long sleepTimeNanoSec = 1_000_000;
-
-//        long timePauseThread = 10; //convertNanoToSeconds / middleSpeedOneThread / inputBufferOneThread; //initial pause eliminate burst download
-//        long speedCurrentThread;
 
         //todo implement various strategy of download from internet
         // opens input stream from the HTTP connection
         try (
-                ReadableByteChannel rbc = Channels.newChannel(httpURLConnection.getInputStream());
-                FileOutputStream fos = new FileOutputStream(fileName)
+                ReadableByteChannel readableByteChannel = Channels.newChannel(connection.getInputStream());
+                FileOutputStream fileOutputStream = new FileOutputStream(fileName)
         ) {
-//                InputStream in = httpURLConnection.getInputStream();
-//                InputStream in = new BufferedInputStream(link.openStream());
-//            byte[] buf = new byte[inputBufferOneThread];
-//            ByteBuffer dst = ByteBuffer.wrap(buf);
 
-            int numBytesRead;
+            long numBytesRead;
 
             while (true) {
 
                 //use Token Bucket Algorithm
-                if (checkAndDecreaseBucket(inputBufferOneThread)) {// true
+                if (checkAndDecreaseBucket(inputBufferOneThread)) {
 
-                    Long timer = System.nanoTime();
+                    long timer = System.nanoTime();
 
-//                numBytesRead = in.read(buf);
-//                numBytesRead = rbc.read(dst);
+                    numBytesRead =  fileOutputStream.
+                            getChannel().
+                            transferFrom(readableByteChannel, bytesDownloaded, inputBufferOneThread);
 
-                    numBytesRead = (int) fos.getChannel().transferFrom(rbc, bytesDownloaded, inputBufferOneThread);
-
-                    //don`t work without checking contentLength
+                    //doesn't work without checking contentLength
                     //todo check for correct downloading file (length, md5?)
                     if (numBytesRead == -1 || bytesDownloaded == contentLength) {
                         break;
@@ -225,47 +214,27 @@ public class Downloader {
 
                     timeSpentByTask += timer;
 
-//                fos.write(buf, 0, numBytesRead);
-                    fos.flush();
+                    fileOutputStream.flush();
 
                     bytesDownloaded += numBytesRead;
 
                     addDownloadedBytes(numBytesRead);
 
-
-                    //approximately
-/*                    speedCurrentThread = convertNanoToSeconds / (timer + timePauseThread) * inputBufferOneThread;
-
-                    timePauseThread = getTimePauseThread(timePauseThread, speedCurrentThread);
-                    currentSpeedOfThreads.put(nameThread, speedCurrentThread);
-
-
-                    statisticThread.speedCounted = speedCurrentThread;
-                    statisticThread.timeOfGettingBuffer = timer;
-                    statisticThread.timeOutSleep = timePauseThread;
-
-                    statisticsOfThreads.put(nameThread, statisticThread);*/
-
-
                 }
-                //todo random timeout? //randomTimeOut.nextInt(10) +
+                //todo random timeout? //randomTimeOut.nextInt(10)
                 TimeUnit.NANOSECONDS.sleep(sleepTimeNanoSec);
                 timeSpentByTask += sleepTimeNanoSec;
             }
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "IOException, " + e.getMessage());
+            LOG.log(Level.WARNING, "Exception, " + e.getMessage());
         }
 
-        httpURLConnection.disconnect();
+        connection.disconnect();
 
         //time of each threads, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
 
-//        currentSpeedOfThreads.put(nameThread, 0L);
-//        statisticsOfThreads.put(nameThread, new DownloadStatistics());
-
-
-        LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}", bytesDownloaded, timeSpentByTask / convertNanoToSeconds, nameThread, link.toString()));
+        LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}", bytesDownloaded, timeSpentByTask / CONVERT_NANO_TO_SECONDS, nameThread, urlFile.getUrl()));
     }
 }
 

@@ -14,10 +14,6 @@ import static cherkasov.com.Main.LOG;
 public class ParserLinks {
     private final ConcurrentLinkedQueue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
 
-    public ConcurrentLinkedQueue<TaskEntity> getQueueTasks() {
-        return queueTasks;
-    }
-
     public ParserLinks(String fileName) {
 
         parseLinks(fileName);
@@ -28,7 +24,7 @@ public class ParserLinks {
     private void parseLinks(String fileName) {
 
         if (!Files.exists(Paths.get(fileName))) {
-            LOG.log(Level.WARNING, "File whit links does not exist ");
+            LOG.log(Level.WARNING, "File whit links does not exist!");
             System.exit(-1);
         }
 
@@ -37,6 +33,7 @@ public class ParserLinks {
 
             for (String line : lines) {
 
+                //if line is fewer than 3 chars, then this line is useless
                 if (line.length() < 3) {
                     continue;
                 }
@@ -58,6 +55,10 @@ public class ParserLinks {
         } catch (IOException e) {
             LOG.log(Level.WARNING, e.getMessage());
         }
+    }
+
+    public ConcurrentLinkedQueue<TaskEntity> getQueueTasks() {
+        return queueTasks;
     }
 }
 

@@ -19,7 +19,7 @@ public class ParserParameters {
     private final String MAX_DOWNLOAD_SPEED_KEY = "-l";
     private final String FILE_NAME_WITH_LINKS_KEY = "-f";
     private final String OUTPUT_FOLDER_KEY = "-o";
-    private final String DEBUG_KEY = "-d";
+//    private final String DEBUG_KEY = "-d";
 
     public boolean isDebug() {
         return debug;
@@ -71,17 +71,19 @@ public class ParserParameters {
                 LOG.log(Level.WARNING, "Index of parameter out of array bounds");
             }
         }
-        LOG.log(Level.INFO, "Parsing command line parameters was done");
+        LOG.log(Level.INFO, "Parsing command line parameters done");
     }
 
     //todo check for wrong strings
     private int parseIntoNumber(String arg) {
 
-        if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') return 0;
+        if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') {
+            return 0;
+        }
 
-        StringBuilder result = new StringBuilder("0");
+        StringBuilder result = new StringBuilder();
 
-        int power = 1;
+        int scale = 1;
 
         for (int i = 0; i < arg.length(); i++) {
 
@@ -93,12 +95,15 @@ public class ParserParameters {
 
             switch (c){
                 case 'k':
-                case 'K':  power = 1024; break;
+                case 'K':  scale = 1024;
+                break;
                 case 'm':
-                case 'M':  power = 1024 * 1024; break;
+                case 'M':  scale = 1024 * 1024;
+                break;
+                default:
             }
         }
-        return Integer.parseInt(result.toString()) * power;
+        return Integer.parseInt(result.toString()) * scale;
     }
 }
 

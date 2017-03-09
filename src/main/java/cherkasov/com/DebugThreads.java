@@ -14,6 +14,7 @@ public class DebugThreads {
     private final List<String> statistic = new ArrayList<>();
     private final boolean debugState;
     private final Downloader downloader;
+    private final String fileNameStatistic = "statistic.txt";
 
     public DebugThreads(boolean debugState, Downloader downloader) {
         this.debugState = debugState;
@@ -43,7 +44,8 @@ public class DebugThreads {
 
         final FileWriter fileWriter;
         try {
-            fileWriter = new FileWriter("statistic.txt");
+
+            fileWriter = new FileWriter(fileNameStatistic);
 
             synchronized (this) {
                 statistic.forEach(str -> {
@@ -56,6 +58,7 @@ public class DebugThreads {
             fileWriter.close();
 
         } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -70,11 +73,12 @@ public class DebugThreads {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
                 }
 
-                System.out.println(MessageFormat.format("Speed: {0}; bucket: {1}", downloader.getDownloadedBytesSum().longValue() - previousBytes, downloader.getDownloadBucket().get()));
+                System.out.println(MessageFormat.format("Speed: {0}; bucket: {1}", downloader.getDownloadedBytesSummary().longValue() - previousBytes, downloader.getBucketCommon().get()));
 
-                previousBytes = downloader.getDownloadedBytesSum().longValue();
+                previousBytes = downloader.getDownloadedBytesSummary().longValue();
             }
         });
 
@@ -106,7 +110,7 @@ if (! debugState) return;
 
         @Override
         public String toString() {
-            return "Stat{" +
+            return "Stats{" +
                     "buff=" + bufferSize +
                     ", time=" + timeOfGettingBuffer +
                     ", sleep=" + timeOutSleep +
@@ -114,6 +118,5 @@ if (! debugState) return;
                     '}';
         }
     }
-
 }
 

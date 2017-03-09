@@ -1,7 +1,7 @@
 package cherkasov.com;
 
 //task with url and file
-class TaskEntity {
+public class TaskEntity {
     private final String url;
     private final String fileName;
 

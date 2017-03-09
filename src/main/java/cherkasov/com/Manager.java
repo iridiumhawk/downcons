@@ -31,7 +31,7 @@ public class Manager {
             try {
                 Files.createDirectory(dir);
             } catch (IOException e) {
-                LOG.log(Level.WARNING, "createDirectory Exception, " + e.getMessage());
+                LOG.log(Level.WARNING, "create Directory Exception, " + e.getMessage());
             }
         }
 
@@ -40,6 +40,7 @@ public class Manager {
 
         downloader.start();
 
-        return downloader.getDownloadedBytesSum().get();
+        //return atomic long
+        return downloader.getDownloadedBytesSummary().get();
     }
 }
