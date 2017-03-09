@@ -5,8 +5,6 @@ import cherkasov.com.source.Connection;
 import cherkasov.com.source.HttpConnection;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Paths;
@@ -20,7 +18,8 @@ import static cherkasov.com.Main.LOG;
 
 public class Downloader {
     private final ConcurrentLinkedQueue<TaskEntity> queueThreadTasks;
-    private final ParserParameters parametersOfWork;
+//    private final ParserParameters parameters;
+    private final Parameters parameters;
     private final DebugThreads debugThreads;
 
     private volatile AtomicLong downloadedBytesSummary = new AtomicLong(0L);
@@ -34,14 +33,14 @@ public class Downloader {
     private final int GRANULARITY_OF_MANAGEMENT = 10;
 
 
-    public Downloader(ConcurrentLinkedQueue<TaskEntity> queueTasks, ParserParameters parserParameters) {
+    public Downloader(ConcurrentLinkedQueue<TaskEntity> queueTasks, Parameters parameters) {
         this.queueThreadTasks = queueTasks;
-        this.parametersOfWork = parserParameters;
-        this.middleSpeedOneThread = parametersOfWork.getMaxDownloadSpeed() / parametersOfWork.getNumberOfThreads();
+        this.parameters = parameters;
+        this.middleSpeedOneThread = parameters.getMaxDownloadSpeed() / parameters.getNumberOfThreads();
         //buffer for one request
         this.inputBufferOneThread = middleSpeedOneThread / GRANULARITY_OF_MANAGEMENT;
 
-        this.debugThreads = new DebugThreads(parametersOfWork.isDebug(), this);
+        this.debugThreads = new DebugThreads(parameters.isDebug(), this);
     }
 
     public AtomicLong getBucketCommon() {
@@ -73,7 +72,7 @@ public class Downloader {
         threadBucketFill();
 
         //start threads
-        threadsExecutor(parametersOfWork.getNumberOfThreads());
+        threadsExecutor(parameters.getNumberOfThreads());
 
 //save debug data
 //       debugThreads. saveStatistics();
@@ -89,7 +88,7 @@ public class Downloader {
             //milliseconds
             final long timeToSleepBeforeFill = 100;
 
-            final long valueOfFilling =  parametersOfWork.getMaxDownloadSpeed() / (1000 / timeToSleepBeforeFill);
+            final long valueOfFilling =  parameters.getMaxDownloadSpeed() / (1000 / timeToSleepBeforeFill);
 
             while (true) {
                 try {
@@ -109,8 +108,8 @@ public class Downloader {
 
         bucketCommon.accumulateAndGet(updateValue, (current, given) -> {
             long result = current + given;
-            if (result > parametersOfWork.getMaxDownloadSpeed()) {
-                result = parametersOfWork.getMaxDownloadSpeed();
+            if (result > parameters.getMaxDownloadSpeed()) {
+                result = parameters.getMaxDownloadSpeed();
             }
             return result;
         });
@@ -137,7 +136,7 @@ public class Downloader {
             while (!queueThreadTasks.isEmpty()) {
                 try {
                     TaskEntity task = queueThreadTasks.poll();
-                    downloadFile(task, new HttpConnection(task),Thread.currentThread().getName());
+                    downloadFile(task, new HttpConnection(task.getUrl()), Thread.currentThread().getName());
 
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Download Exception, " + e.getMessage());
@@ -165,16 +164,16 @@ public class Downloader {
         LOG.log(Level.INFO, MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds", spentTimeSummary.get() / CONVERT_NANO_TO_SECONDS));
     }
 
-    private void downloadFile(TaskEntity urlFile, Connection connection, String nameThread) {
+    private void downloadFile(TaskEntity task, Connection connection, String nameThread) {
 
-        if (!connection.isConnected()) {
+        if (!connection.connect()) {
             LOG.log(Level.WARNING, "Don't have connection!");
             return;
         }
 
-        LOG.log(Level.INFO, "Download url: " + urlFile.getUrl() + " start");
+        LOG.log(Level.INFO, "Download url: " + task.getUrl() + " start");
 
-        String fileName = Paths.get(parametersOfWork.getOutputFolder(), urlFile.getFileName()).toString();
+        String fileName = Paths.get(parameters.getOutputFolder(), task.getFileName()).toString();
 
 //        String disposition = httpURLConnection.getHeaderField("Content-Disposition");
 //        String contentType = httpURLConnection.getContentType();
@@ -234,7 +233,7 @@ public class Downloader {
         //time of each threads, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
 
-        LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}", bytesDownloaded, timeSpentByTask / CONVERT_NANO_TO_SECONDS, nameThread, urlFile.getUrl()));
+        LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}", bytesDownloaded, timeSpentByTask / CONVERT_NANO_TO_SECONDS, nameThread, task.getUrl()));
     }
 }
 

@@ -6,52 +6,37 @@ import static cherkasov.com.Main.LOG;
 
 //parsing command line parameters
 public class ParserParameters {
-
-    //default values
-    private int numberOfThreads = 1;
-    private int maxDownloadSpeed = 1000000; //bytes in second
-    private String fileNameWithLinks = "links.txt";
-    private String outputFolder = "download";
-    private boolean debug = true;
+    private final String[] args;
 
     //command line keys
     private final String NUMBER_OF_THREADS_KEY = "-n";
     private final String MAX_DOWNLOAD_SPEED_KEY = "-l";
     private final String FILE_NAME_WITH_LINKS_KEY = "-f";
     private final String OUTPUT_FOLDER_KEY = "-o";
-//    private final String DEBUG_KEY = "-d";
+    private final String DEBUG_KEY = "-d";
 
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public int getNumberOfThreads() {
-        return numberOfThreads;
-    }
-
-    public int getMaxDownloadSpeed() {
-        return maxDownloadSpeed;
-    }
-
-    public String getFileNameWithLinks() {
-        return fileNameWithLinks;
-    }
-
-    public String getOutputFolder() {
-        return outputFolder;
-    }
 
     public ParserParameters(String[] args) {
-        parseArgs(args);
+        this.args = args;
     }
 
-    public void parseArgs(String[] args) {
+    public ParserParameters() {
+        this.args = new String[0];
+    }
+
+    public Parameters parseArgs() {
+
+        int numberOfThreads = 0;
+        int maxDownloadSpeed = 0;
+        String fileNameWithLinks = "";
+        String outputFolder = "";
+        boolean debug = false;
 
         for (int i = 0; i < args.length; i++) {
             try {
                 switch (args[i]) {
                     case NUMBER_OF_THREADS_KEY:
-                        numberOfThreads = Integer.parseInt(args[i + 1]);
+                        numberOfThreads = parseIntoNumber(args[i + 1]);
                         break;
 
                     case MAX_DOWNLOAD_SPEED_KEY:
@@ -66,12 +51,19 @@ public class ParserParameters {
                         outputFolder = args[i + 1];
                         break;
 
+                    case DEBUG_KEY:
+                        debug = Boolean.valueOf(args[i + 1]);
+                        break;
+                    default:
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
                 LOG.log(Level.WARNING, "Index of parameter out of array bounds");
             }
         }
+
         LOG.log(Level.INFO, "Parsing command line parameters done");
+
+        return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
     }
 
     //todo check for wrong strings
@@ -81,7 +73,7 @@ public class ParserParameters {
             return 0;
         }
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder("0");
 
         int scale = 1;
 
@@ -93,13 +85,15 @@ public class ParserParameters {
                 result.append(c);
             }
 
-            switch (c){
+            switch (c) {
                 case 'k':
-                case 'K':  scale = 1024;
-                break;
+                case 'K':
+                    scale = 1024;
+                    break;
                 case 'm':
-                case 'M':  scale = 1024 * 1024;
-                break;
+                case 'M':
+                    scale = 1024 * 1024;
+                    break;
                 default:
             }
         }

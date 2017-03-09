@@ -11,4 +11,5 @@ public interface Connection {
     InputStream getInputStream() throws IOException;
     void disconnect();
     boolean isConnected();
+    boolean connect();
 }

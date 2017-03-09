@@ -15,33 +15,36 @@ import static cherkasov.com.Main.LOG;
  */
 public class HttpConnection implements Connection {
     private HttpURLConnection httpURLConnection;
+    private String url;
+    private boolean connected = false;
 
-    private boolean connected;
+    public HttpConnection(String url) {
+        this.url = url;
+    }
 
-    public HttpConnection(TaskEntity urlFile) {
-        if (urlFile == null) {
-            connected = false;
-            return;
+    @Override
+    public boolean connect() {
+
+        if (url == null) {
+            return false;
         }
 
         try {
-            URL link = new URL(urlFile.getUrl());
+            URL link = new URL(url);
             httpURLConnection = (HttpURLConnection) link.openConnection();
             int responseCode = httpURLConnection.getResponseCode();
 
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 LOG.log(Level.WARNING, "Response Code, " + responseCode);
-                connected = false;
-                return;
+                return false;
             }
 
         } catch (IOException e) {
             LOG.log(Level.WARNING, "URLException Exception, " + e.getMessage());
-            connected = false;
-            return;
+            return false;
         }
 
-        connected = true;
+       return connected = true;
     }
 
     @Override

@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DownloaderTest {
     private ConcurrentLinkedQueue<TaskEntity> queueTasks;
-    private ParserParameters parserParameters;
+    private Parameters parameters;
 
     @Before
     public void setUp() throws Exception {
-//        queueTasks = new ConcurrentLinkedQueue<>();
+/*//        queueTasks = new ConcurrentLinkedQueue<>();
         String url = "http://download.advanceduninstaller.com/soft/uninstaller/Advanced_Uninstaller12.exe";
         String file = "Advanced_Uninstaller12.exe";
 
@@ -24,18 +24,13 @@ public class DownloaderTest {
         queueTasks = new ParserLinks("links.txt").getQueueTasks();
 
         String[] args = {"-n", "5", "-l", "1M", "-f", "links.txt", "-o", "output"};
-        parserParameters = new ParserParameters(args);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
+        parserParameters = new ParserParameters(args);*/
     }
 
     @Test
     public void start() throws Exception {
 
-        new Downloader(queueTasks, parserParameters).start();
+//        new Downloader(queueTasks, parameters).start();
 
     }
 

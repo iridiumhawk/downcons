@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
 import static cherkasov.com.Main.LOG;
@@ -18,13 +19,15 @@ public class Manager {
     public long execute() {
 
         //parsing parameters
-        ParserParameters parserParameters = new ParserParameters(args);
+        final ParserParameters parserParameters = new ParserParameters(args);
+        final Parameters parameters = parserParameters.parseArgs();
 
         //parsing links file
-        ParserLinks parserLinks = new ParserLinks(parserParameters.getFileNameWithLinks());
+        final ParserLinks parserLinks = new ParserLinks(parameters.getFileNameWithLinks());
+        final ConcurrentLinkedQueue<TaskEntity> queueTasks = parserLinks.parseLinks(parserLinks.loadFile());
 
         //get output folder
-        Path dir = Paths.get(parserParameters.getOutputFolder());
+        Path dir = Paths.get(parameters.getOutputFolder());
 
         //check for exist and create output folder
         if (!Files.isDirectory(dir)) {
@@ -32,12 +35,12 @@ public class Manager {
                 Files.createDirectory(dir);
             } catch (IOException e) {
                 LOG.log(Level.WARNING, "create Directory Exception, " + e.getMessage());
+                e.printStackTrace();
             }
         }
 
         //create downloader instance
-        Downloader downloader = new Downloader(parserLinks.getQueueTasks(), parserParameters);
-
+        final Downloader downloader = new Downloader(queueTasks, parameters);
         downloader.start();
 
         //return atomic long
