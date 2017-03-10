@@ -29,7 +29,7 @@ public class Main {
     private static long workingTime = 0L;
 
     public static void main(String[] args) {
-        LOG.setLevel(Level.INFO);
+        LOG.setLevel(Level.SEVERE);
 
         LOG.log(Level.INFO, "Program started");
 

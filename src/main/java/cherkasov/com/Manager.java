@@ -1,9 +1,11 @@
 package cherkasov.com;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
@@ -24,7 +26,16 @@ public class Manager {
 
         //parsing links file
         final ParserLinks parserLinks = new ParserLinks(parameters.getFileNameWithLinks());
-        final ConcurrentLinkedQueue<TaskEntity> queueTasks = parserLinks.parseLinks(parserLinks.loadFile());
+        List<String> stringsFromFile = null;
+        try {
+            stringsFromFile = parserLinks.loadFile();
+        } catch (FileNotFoundException e) {
+            LOG.log(Level.SEVERE, "Abort. " + e.getMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        final ConcurrentLinkedQueue<TaskEntity> queueTasks  = parserLinks.parseLinks(stringsFromFile);
 
         //get output folder
         Path dir = Paths.get(parameters.getOutputFolder());
@@ -34,7 +45,7 @@ public class Manager {
             try {
                 Files.createDirectory(dir);
             } catch (IOException e) {
-                LOG.log(Level.WARNING, "create Directory Exception, " + e.getMessage());
+                LOG.log(Level.SEVERE, "Create Directory Exception, " + e.getMessage());
                 e.printStackTrace();
             }
         }

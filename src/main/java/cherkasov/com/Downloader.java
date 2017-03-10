@@ -225,7 +225,7 @@ public class Downloader {
                 timeSpentByTask += sleepTimeNanoSec;
             }
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "Exception, " + e.getMessage());
+            LOG.log(Level.WARNING, "Exception in downloader thread, " + e.getMessage());
         }
 
         connection.disconnect();
@@ -233,7 +233,12 @@ public class Downloader {
         //time of each threads, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
 
-        LOG.log(Level.INFO, MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}", bytesDownloaded, timeSpentByTask / CONVERT_NANO_TO_SECONDS, nameThread, task.getUrl()));
+        LOG.log(Level.INFO,
+                MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}",
+                bytesDownloaded,
+                        timeSpentByTask / CONVERT_NANO_TO_SECONDS,
+                        nameThread,
+                        task.getUrl()));
     }
 }
 

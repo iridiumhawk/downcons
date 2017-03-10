@@ -1,6 +1,5 @@
 package cherkasov.com;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -12,8 +11,8 @@ public class ParametersTest {
 
     @Test
     public void isDebug() throws Exception {
-        Parameters parameters = new Parameters(0, 0, "", "", false);
-        assertEquals(false , parameters.isDebug());
+        Parameters parameters = new Parameters(0, 0, "", "", true);
+        assertEquals(true , parameters.isDebug());
     }
 
     @Test
@@ -43,11 +42,27 @@ public class ParametersTest {
 
     @Test
     public void getFileNameWithLinks() throws Exception {
+        Parameters parameters = new Parameters(0, 0, "test.txt", "", false);
+        assertEquals("test.txt" , parameters.getFileNameWithLinks());
+
+        parameters = new Parameters(0, 0, "", "", false);
+        assertEquals("links.txt" , parameters.getFileNameWithLinks());
+
+        parameters = new Parameters(0, 0, null, "", false);
+        assertEquals("links.txt" , parameters.getFileNameWithLinks());
 
     }
 
     @Test
     public void getOutputFolder() throws Exception {
+        Parameters parameters = new Parameters(0, 0, "", "output", false);
+        assertEquals("output" , parameters.getOutputFolder());
+
+        parameters = new Parameters(0, 0, "", "", false);
+        assertEquals("download" , parameters.getOutputFolder());
+
+        parameters = new Parameters(0, 0, "", null, false);
+        assertEquals("download" , parameters.getOutputFolder());
 
     }
 

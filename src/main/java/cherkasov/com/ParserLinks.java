@@ -18,37 +18,33 @@ public class ParserLinks {
 
     public ParserLinks(String fileName) {
         this.fileName = fileName;
+
     }
 
-    public List<String> loadFile() {
+    public List<String> loadFile() throws FileNotFoundException {
 
         if (!Files.exists(Paths.get(fileName))) {
-           /* try {
-                throw  new FileNotFoundException();
-            } catch (FileNotFoundException e) {*/
-
-            LOG.log(Level.WARNING, "File with links does not exist! ");
-//                e.printStackTrace();
-            System.exit(-1);
-
-
+            throw  new FileNotFoundException("File with links does not exist.");
         }
 
         List<String> lines = new ArrayList<>();
         try {
             lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "Error reading file, " + e.getMessage());
+            LOG.log(Level.SEVERE, "Error reading file. " + e.getMessage());
             e.printStackTrace();
-            System.exit(-1);
         }
         return lines;
     }
 
 
-    public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines) {
+    public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines) throws NullPointerException {
 
 //        List<String> lines = loadFile();
+
+        if (lines == null) {
+            throw new RuntimeException("List of links and files is null.");
+        }
 
         final ConcurrentLinkedQueue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
 

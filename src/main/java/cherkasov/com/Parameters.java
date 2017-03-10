@@ -1,18 +1,19 @@
 package cherkasov.com;
 
 public class Parameters {
-    //default values
-    private int numberOfThreads = 1;
-    private int maxDownloadSpeed = 1000000; //bytes in second
-    private String fileNameWithLinks = "links.txt";
-    private String outputFolder = "download";
+    private int numberOfThreads ;
+    private int maxDownloadSpeed ; //bytes in second
+    private String fileNameWithLinks;
+    private String outputFolder ;
     private boolean debug = false;
 
     public Parameters(int numberOfThreads, int maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {
-        this.numberOfThreads = numberOfThreads > 0 ? numberOfThreads : this.numberOfThreads;
-        this.maxDownloadSpeed = maxDownloadSpeed > 0 ? maxDownloadSpeed : this.maxDownloadSpeed;
-        this.fileNameWithLinks = "".equals(fileNameWithLinks) ? this.fileNameWithLinks : fileNameWithLinks;
-        this.outputFolder = "".equals(outputFolder) ? this.outputFolder : outputFolder;
+
+        //check and set default values if necessary
+        this.numberOfThreads = numberOfThreads > 0 ? numberOfThreads : 1;
+        this.maxDownloadSpeed = maxDownloadSpeed > 0 ? maxDownloadSpeed : 1000000;
+        this.fileNameWithLinks = (fileNameWithLinks == null || "".equals(fileNameWithLinks)) ? "links.txt" : fileNameWithLinks;
+        this.outputFolder = (outputFolder == null || "".equals(outputFolder)) ? "download" : outputFolder;
         this.debug = debug;
     }
 
@@ -50,7 +51,7 @@ public class Parameters {
         return getOutputFolder().equals(that.getOutputFolder());
     }
 
-/*    @Override
+    @Override
     public int hashCode() {
         int result = getNumberOfThreads();
         result = 31 * result + getMaxDownloadSpeed();
@@ -58,5 +59,5 @@ public class Parameters {
         result = 31 * result + getOutputFolder().hashCode();
         result = 31 * result + (isDebug() ? 1 : 0);
         return result;
-    }*/
+    }
 }

@@ -44,11 +44,11 @@ public class ParserParameters {
                         break;
 
                     case FILE_NAME_WITH_LINKS_KEY:
-                        fileNameWithLinks = args[i + 1];
+                        fileNameWithLinks = checkArg(args[i + 1]);
                         break;
 
                     case OUTPUT_FOLDER_KEY:
-                        outputFolder = args[i + 1];
+                        outputFolder = checkArg(args[i + 1]);
                         break;
 
                     case DEBUG_KEY:
@@ -57,7 +57,7 @@ public class ParserParameters {
                     default:
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
-                LOG.log(Level.WARNING, "Index of parameter out of array bounds");
+                LOG.log(Level.INFO, "Index of parsing parameter out of array bounds");
             }
         }
 
@@ -66,7 +66,13 @@ public class ParserParameters {
         return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
     }
 
-    //todo check for wrong strings
+    private String checkArg(String arg) {
+        if (arg == null || "".equals(arg) || arg.charAt(0) == '-') {
+            return "";
+        }
+        return arg;
+    }
+
     private int parseIntoNumber(String arg) {
 
         if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') {
