@@ -16,7 +16,9 @@ public class FakeConnection implements Connection {
     }
 
     @Override
-    public boolean connect() { return true;}
+    public boolean connect() {
+        return true;
+    }
 
     @Override
     public boolean isConnected() {
@@ -26,7 +28,12 @@ public class FakeConnection implements Connection {
 
     @Override
     public long getContentLength() {
-        return 10000000;
+        try {
+            return inputStream.available();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     @Override

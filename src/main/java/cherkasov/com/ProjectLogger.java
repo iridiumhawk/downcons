@@ -3,14 +3,15 @@ package cherkasov.com;
 import java.io.IOException;
 import java.util.logging.*;
 
-class ProjectLogger {
+public class ProjectLogger {
+    public static final Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());
 
     private static final String LOG_FILE_NAME = "downloader.log";
     private static final int LIMIT_LOG_FILE_SIZE = 1000000; // 1 Mb
     private static final Level LOGGER_LEVEL = Level.OFF;
 
     //todo change format logger
-    static Logger initFileLogging(String loggerName) {
+    private static Logger initFileLogging(String loggerName) {
 
         Logger logger = Logger.getLogger(loggerName);
 

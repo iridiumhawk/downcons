@@ -24,34 +24,19 @@ import java.util.logging.*;
 
 public class Main {
 
-    public static final Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());
 
-    private static long workingTime = 0L;
 
     public static void main(String[] args) {
-        LOG.setLevel(Level.SEVERE);
 
-        LOG.log(Level.INFO, "Program started");
 
-        workingTime = System.currentTimeMillis();
 
         Manager manager = new Manager(args);
 
-        long downloadedBytes = manager.execute();
+        manager.execute();
 
-        workingTime = (System.currentTimeMillis() - workingTime) / 1000; // in seconds
 
-        System.out.println(MessageFormat.format(
-                "Time spent for all tasks: {0} seconds",
-                workingTime));
 
-        System.out.println(MessageFormat.format(
-                "Total downloaded: {0} byte ({1} MegaByte), average speed: {2} byte/sec",
-                downloadedBytes,
-                downloadedBytes / 1024 / 1024,
-                downloadedBytes / (workingTime)));
 
-        LOG.log(Level.INFO, "Program ended");
     }
 }
 

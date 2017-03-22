@@ -8,7 +8,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
 
-import static cherkasov.com.Main.LOG;
+import static cherkasov.com.ProjectLogger.LOG;
+
 
 /**
  * Created by cherkasov on 09.03.17.

@@ -4,12 +4,11 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
-import static cherkasov.com.Main.LOG;
+import static cherkasov.com.ProjectLogger.LOG;
 
 //parsing file with links and put them in tasks queue
 public class ParserLinks {
@@ -21,37 +20,30 @@ public class ParserLinks {
 
     }
 
-    public List<String> loadFile() throws FileNotFoundException {
+    public List<String> loadFile() throws IOException {
 
         if (!Files.exists(Paths.get(fileName))) {
             throw  new FileNotFoundException("File with links does not exist.");
         }
 
-        List<String> lines = new ArrayList<>();
-        try {
-            lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            LOG.log(Level.SEVERE, "Error reading file. " + e.getMessage());
-            e.printStackTrace();
-        }
+        List<String> lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+
         return lines;
     }
 
 
-    public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines) throws NullPointerException {
-
-//        List<String> lines = loadFile();
+    public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines)  {
 
         if (lines == null) {
-            throw new RuntimeException("List of links and files is null.");
+            throw new NullPointerException("List of links is null.");
         }
 
         final ConcurrentLinkedQueue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
 
         for (String line : lines) {
 
-            //if line is fewer than 3 chars length, then this line is useless
-            if (line.length() < 3) {
+            //if line is fewer than 12 chars length, then this line is useless
+            if (line.length() < 12) {
                 continue;
             }
 
@@ -72,7 +64,5 @@ public class ParserLinks {
 
         return queueTasks;
     }
-
-
 }
 

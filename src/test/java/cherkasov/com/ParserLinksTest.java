@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -23,39 +25,51 @@ public class ParserLinksTest {
 
     @Before
     public void setUp() throws Exception {
-        parserLinks = new ParserLinks("123456789.txt");
+        parserLinks = new ParserLinks("not_exist_file.txt");
     }
 
     @Test
-    public void testLoadFileDoesNotExist() throws FileNotFoundException {
+    public void testLoadFileDoesNotExistFile() throws IOException {
         exception.expect(FileNotFoundException.class);
         parserLinks.loadFile();
     }
 
     @Test
-    public void testParseLinksCorrect() {
+    public void testParseLinksWithNullList() {
+        exception.expect(NullPointerException.class);
+        parserLinks.parseLinks(null);
+    }
+
+    @Test
+    public void testParseLinksCorrectAddedTask() {
 
         List<String> lines = new ArrayList<>();
         lines.add("http://example.com/archive.zip my_archive.zip");
 
         ConcurrentLinkedQueue<TaskEntity> queue = parserLinks.parseLinks(lines);
 
-        assertEquals(queue.poll(),
-                new TaskEntity("http://example.com/archive.zip", "my_archive.zip"));
+        TaskEntity actual = new TaskEntity("http://example.com/archive.zip", "my_archive.zip");
+        assertEquals(queue.poll(), actual);
     }
 
     @Test
-    public void testParseLinksFailWithNull() {
-        exception.expect(RuntimeException.class);
-        parserLinks.parseLinks(null);
+    public void testParseLinksWithNoCorrectLines() {
+
+        List<String> lines = new ArrayList<>();
+        lines.add("http m");
+
+        ConcurrentLinkedQueue<TaskEntity> queue = parserLinks.parseLinks(lines);
+        ConcurrentLinkedQueue<TaskEntity> actual = new ConcurrentLinkedQueue<>();
+
+        assertEquals(queue.isEmpty(), actual.isEmpty());
     }
 
     @Test
     public void testParseLinksEmptyQueueWithEmptyList() {
 
-        assertEquals(new ConcurrentLinkedQueue<TaskEntity>().isEmpty(),
-                parserLinks.parseLinks(new ArrayList<>()).isEmpty());
+        ConcurrentLinkedQueue<TaskEntity> queue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<TaskEntity> actual = parserLinks.parseLinks(new ArrayList<>());
+
+        assertEquals(queue.isEmpty(), actual.isEmpty());
     }
-
-
 }
