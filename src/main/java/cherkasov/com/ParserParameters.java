@@ -21,10 +21,10 @@ public class ParserParameters {
     public ParserParameters(String[] args) {
         this.args = args;
     }
-/*
+
     public ParserParameters() {
         this.args = new String[0];
-    }*/
+    }
 
     public Parameters parseArgs() {
         // create Options object

@@ -42,6 +42,7 @@ public class DownloaderTest {
         parameters = new Parameters(5, 5000000, "", "output", true);
     }
 
+    @Ignore
     @Test
     public void start() throws Exception {
 

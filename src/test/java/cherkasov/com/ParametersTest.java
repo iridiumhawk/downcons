@@ -1,6 +1,7 @@
 package cherkasov.com;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -34,7 +35,7 @@ public class ParametersTest {
         assertEquals(10, parameters.getNumberOfThreads());
 
     }
-
+    @Ignore
     @Test
     public void getMaxDownloadSpeed() throws Exception {
         Parameters parameters = new Parameters(0, 0, "", "", false);
@@ -46,7 +47,7 @@ public class ParametersTest {
         parameters = new Parameters(0, Integer.MAX_VALUE, "", "", false);
         assertEquals(Integer.MAX_VALUE, parameters.getMaxDownloadSpeed());
     }
-
+    @Ignore
     @Test
     public void getFileNameWithLinks() throws Exception {
         Parameters parameters = new Parameters(0, 0, "test.txt", "", false);
@@ -59,7 +60,7 @@ public class ParametersTest {
         assertEquals("links.txt", parameters.getFileNameWithLinks());
 
     }
-
+    @Ignore
     @Test
     public void getOutputFolder() throws Exception {
         Parameters parameters = new Parameters(0, 0, "", "output", false);

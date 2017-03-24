@@ -1,6 +1,7 @@
 .idea
+.gradle
 out
-target
+build
 *.iml
 log
-*.patch
+
