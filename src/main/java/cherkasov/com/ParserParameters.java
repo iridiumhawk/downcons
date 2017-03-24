@@ -68,7 +68,7 @@ public class ParserParameters {
 
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
-        String helpMessage = "downcons.jar -n threads -l speed -f file -o folder [-d -h -v]";
+        String helpMessage = "downcons.jar options";
 
         // parse the command line arguments
         try {
@@ -85,7 +85,7 @@ public class ParserParameters {
         }
 
         if (cmd.hasOption("v")) {
-            System.out.println("version: 1.0");
+            System.out.println("version: 1.?");
             return null;
         }
 
@@ -109,7 +109,7 @@ public class ParserParameters {
         if (numberOfThreads > 0 && maxDownloadSpeed > 0
                 && fileNameWithLinks != null && outputFolder != null
                 && !fileNameWithLinks.trim().equals("") && !outputFolder.trim().equals("")) {
-            LOG.log(Level.INFO, "Parsing of command line parameters done");
+            LOG.log(Level.INFO, "Parsing of command line parameters was done");
 
             return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
         } else {
@@ -117,6 +117,7 @@ public class ParserParameters {
         }
     }
 
+    @Deprecated
     public Parameters parseArgsOld() {
 
         int numberOfThreads = 0;

@@ -4,7 +4,7 @@ version '0.9'
 apply plugin: "java"
 apply plugin: "application"
 
-mainClassName = "com.cherkasov.Main"
+mainClassName = "cherkasov.com.Main"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -18,7 +18,7 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     // https://mvnrepository.com/artifact/org.mockito/mockito-all
-    compile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 }
 
 jar {

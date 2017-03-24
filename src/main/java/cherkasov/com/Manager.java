@@ -25,7 +25,7 @@ public class Manager {
 
     public void execute() {
 
-        LOG.setLevel(Level.WARNING);
+        LOG.setLevel(Level.SEVERE);
 
         LOG.log(Level.INFO, "Program started");
 
@@ -34,7 +34,7 @@ public class Manager {
         final Parameters parameters = parserParameters.parseArgs();
 
         if (parameters == null) {
-            LOG.log(Level.SEVERE, "Parameters incorrect.");
+            LOG.log(Level.WARNING, "Parameters incorrect.");
             System.exit(1);
         }
 
