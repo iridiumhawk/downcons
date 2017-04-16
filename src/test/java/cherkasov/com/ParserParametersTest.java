@@ -39,8 +39,6 @@ public class ParserParametersTest {
         parser = new ParserParameters(argsWithNoParam);
         Parameters parametersExpected = parser.parseArgs();
 
-/*        Parameters parametersActual = new Parameters(1, 1000000, "links.txt", "download", false);*/
-
         assertEquals(parametersExpected, null);
     }
 
@@ -51,8 +49,6 @@ public class ParserParametersTest {
         parser = new ParserParameters(argsCrack);
         Parameters parametersExpected = parser.parseArgs();
 
-/*        Parameters parametersActual = new Parameters(1, 1000, "test.txt", "output", false);*/
-
         assertEquals(parametersExpected, null);
     }
 
@@ -62,8 +58,6 @@ public class ParserParametersTest {
 
         parser = new ParserParameters(argsWithMissedParam);
         Parameters parametersExpected = parser.parseArgs();
-/*
-        Parameters parametersActual = new Parameters(1, 1000, "test.txt", "output", false);*/
 
         assertEquals(parametersExpected, null);
     }
@@ -75,14 +69,9 @@ public class ParserParametersTest {
 
         parser = new ParserParameters(argsWithFileNameEmpty);
         Parameters parametersExpected = parser.parseArgs();
-/*
-        Parameters parametersActual = new Parameters(10, 1000, "links.txt", "output", false);*/
 
         assertEquals(parametersExpected, null);
     }
-
-
-
 
     @Test
     public void testParseArgsNotFull() throws Exception {
@@ -90,10 +79,6 @@ public class ParserParametersTest {
 
         parser = new ParserParameters(argsNotFull);
         Parameters parametersExpected = parser.parseArgs();
-
-/*
-        Parameters parametersActual = new Parameters(1, 1000000, "test.txt", "download", false);
-*/
 
         assertEquals(parametersExpected, null);
     }
@@ -107,14 +92,17 @@ public class ParserParametersTest {
         Method method = clazz.getDeclaredMethod("parseIntoNumber", String.class);
         method.setAccessible(true);
 
-        assertEquals(method.invoke(parser, "2M"), 2 * 1024 * 1024);
-        assertEquals(method.invoke(parser, "2m"), 2 * 1024 * 1024);
-        assertEquals(method.invoke(parser, "2K"), 2 * 1024);
-        assertEquals(method.invoke(parser, "2k"), 2 * 1024);
-        assertEquals(method.invoke(parser, "123456"), 123456);
-        assertEquals(method.invoke(parser, "12345678901234567890"), 0);
-        assertEquals(method.invoke(parser, "-1"), 0);
-        assertEquals(method.invoke(parser, "x"), 0);
-        assertEquals(method.invoke(parser, ""), 0);
+        assertEquals(method.invoke(parser, "2M"), (long) 2 * 1024 * 1024);
+        assertEquals(method.invoke(parser, "2m"), (long) 2 * 1024 * 1024);
+        assertEquals(method.invoke(parser, "2K"), (long) 2 * 1024);
+        assertEquals(method.invoke(parser, "2k"), (long) 2 * 1024);
+        assertEquals(method.invoke(parser, "123456"), 123456L);
+        assertEquals(method.invoke(parser, "10000000000"), 10000000000L);
+        assertEquals(method.invoke(parser, Long.toString(Long.MAX_VALUE)), 9223372036854775807L);
+        assertEquals(method.invoke(parser, Long.toString(Long.MAX_VALUE)+"123"), 0L);
+        assertEquals(method.invoke(parser, "-1"), 0L);
+        assertEquals(method.invoke(parser, "x"), 0L);
+        assertEquals(method.invoke(parser, ""), 0L);
+        assertEquals(method.invoke(parser, (Object) null), 0L);
     }
 }

@@ -30,12 +30,12 @@ public class ParserParameters {
         // create Options object
         Options options = new Options();
 
-        options.addOption("h", "help", false, "print this message");
+        options.addOption("h", "help", false, "print help message");
         options.addOption("v", "version", false, "print the version information and exit");
         options.addOption("d", "debug", false, "output debugging information while working");
 
         options.addOption(Option.builder("n")
-                .desc("number of threads")
+                .desc("number of active threads")
                 .hasArg()
                 .argName("threads")
                 .build());
@@ -85,12 +85,12 @@ public class ParserParameters {
         }
 
         if (cmd.hasOption("v")) {
-            System.out.println("version: 1.?");
+            System.out.println("version: 0.99");
             return null;
         }
 
         int numberOfThreads;
-        int maxDownloadSpeed;
+        long maxDownloadSpeed;
         String fileNameWithLinks;
         String outputFolder;
 
@@ -121,7 +121,7 @@ public class ParserParameters {
     public Parameters parseArgsOld() {
 
         int numberOfThreads = 0;
-        int maxDownloadSpeed = 0;
+        long maxDownloadSpeed = 0;
         String fileNameWithLinks = "";
         String outputFolder = "";
         boolean debug = false;
@@ -130,7 +130,7 @@ public class ParserParameters {
             try {
                 switch (args[i]) {
                     case NUMBER_OF_THREADS_KEY:
-                        numberOfThreads = parseIntoNumber(args[i + 1]);
+                        numberOfThreads = (int) parseIntoNumber(args[i + 1]);
                         break;
 
                     case MAX_DOWNLOAD_SPEED_KEY:
@@ -167,13 +167,13 @@ public class ParserParameters {
         return arg;
     }
 
-    private int parseIntoNumber(String arg) {
+    private long parseIntoNumber(String arg) {
 
         if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') {
-            return 0;
+            return 0L;
         }
 
-        StringBuilder result = new StringBuilder("0");
+        StringBuilder resultString = new StringBuilder();
 
         int scale = 1;
 
@@ -182,7 +182,7 @@ public class ParserParameters {
             char c = arg.charAt(i);
 
             if (c >= '0' && c <= '9') {
-                result.append(c);
+                resultString.append(c);
             }
 
             switch (c) {
@@ -194,19 +194,18 @@ public class ParserParameters {
                 case 'M':
                     scale = 1024 * 1024;
                     break;
-                default:
             }
         }
 
-        int resultInt = 0;
+        long resultInLong = 0;
 
         try {
-            resultInt = Integer.parseInt(result.toString()) * scale;
+            resultInLong = Long.parseLong(resultString.toString()) * scale;
         } catch (NumberFormatException e) {
             LOG.log(Level.WARNING, "Parsing into number fail. " + e.getMessage());
         }
 
-        return resultInt;
+        return resultInLong;
     }
 }
 

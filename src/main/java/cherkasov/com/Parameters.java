@@ -2,12 +2,12 @@ package cherkasov.com;
 
 public class Parameters {
     private int numberOfThreads ;
-    private int maxDownloadSpeed ; //bytes in second
+    private long maxDownloadSpeed ; //bytes in second
     private String fileNameWithLinks;
     private String outputFolder ;
     private boolean debug = false;
 
-    public Parameters(int numberOfThreads, int maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {
+    public Parameters(int numberOfThreads, long maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {
 
         //check and set default values if necessary
         this.numberOfThreads = numberOfThreads > 0 ? numberOfThreads : 1;
@@ -25,7 +25,7 @@ public class Parameters {
         return numberOfThreads;
     }
 
-    public int getMaxDownloadSpeed() {
+    public long getMaxDownloadSpeed() {
         return maxDownloadSpeed;
     }
 
@@ -54,7 +54,7 @@ public class Parameters {
     @Override
     public int hashCode() {
         int result = getNumberOfThreads();
-        result = 31 * result + getMaxDownloadSpeed();
+        result = 31 * result + Long.hashCode(getMaxDownloadSpeed());
         result = 31 * result + getFileNameWithLinks().hashCode();
         result = 31 * result + getOutputFolder().hashCode();
         result = 31 * result + (isDebug() ? 1 : 0);

@@ -1,6 +1,4 @@
-package cherkasov.com.source;
-
-import cherkasov.com.TaskEntity;
+package cherkasov.com.streamsource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +7,6 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
-
 
 /**
  * Created by cherkasov on 09.03.17.

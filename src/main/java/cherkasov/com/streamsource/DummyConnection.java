@@ -1,4 +1,4 @@
-package cherkasov.com.source;
+package cherkasov.com.streamsource;
 
 import java.io.IOException;
 import java.io.InputStream;

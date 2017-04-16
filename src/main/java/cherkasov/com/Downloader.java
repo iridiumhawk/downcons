@@ -1,7 +1,6 @@
 package cherkasov.com;
 
-
-import cherkasov.com.source.*;
+import cherkasov.com.streamsource.*;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -14,15 +13,14 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
-
 public class Downloader {
     private final ConcurrentLinkedQueue<TaskEntity> queueThreadTasks;
     private final Parameters parameters;
     private final DebugThreads debugThreads;
     private final ConnectionType connectionType;
     private final long bucketMaxSize;
-    private final int middleSpeedOneThread;
-    private final int inputBufferOneThread;
+    private final long middleSpeedOneThread;
+    private final long inputBufferOneThread;
 
     private volatile AtomicLong downloadedBytesSummary = new AtomicLong(0L);
     private volatile AtomicLong bucketForAllThreads = new AtomicLong(0L);
@@ -64,9 +62,7 @@ public class Downloader {
 
 
     public void start() {
-//run debug
-//        debugThreads.threadMonitor();
-
+        //run debug
         debugThreads.threadSpeedMonitor();
 
         //start filling bucket
@@ -75,19 +71,17 @@ public class Downloader {
         //start threads
         threadsExecutor(parameters.getNumberOfThreads());
 
-//save debug data
-//       debugThreads. saveStatistics();
     }
 
 
     //Token Bucket Algorithm
     private void threadBucketFill() {
 
-        Thread threadMonitor = new Thread(() -> {
+        Thread bucketFillThread = new Thread(() -> {
 
             //todo implement various strategy of filling
-            //milliseconds
-            final long timeToSleepBeforeFill = 10;
+            //milliseconds to sleep before fill next portion of bytes
+            final long timeToSleepBeforeFill = 100;
 
             final long valueOfFilling = bucketMaxSize / 1000 * timeToSleepBeforeFill;
 
@@ -102,7 +96,7 @@ public class Downloader {
             }
         });
 
-        threadMonitor.start();
+        bucketFillThread.start();
     }
 
     private void increaseBucket(final long updateValue) {
@@ -140,14 +134,13 @@ public class Downloader {
                     downloadFile(task,
                             getConnection(task.getUrl()),
                             Thread.currentThread().getName());
-//                    downloadFile(task, new HttpConnection(task.getUrl()), Thread.currentThread().getName());
 
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Download Exception, " + e.getMessage());
                 }
             }
 
-            //if no more tasks in queue
+            //stop thread if no more tasks in queue
             latch.countDown();
         };
 
@@ -189,9 +182,6 @@ public class Downloader {
         LOG.log(Level.INFO, "Download url: " + task.getUrl() + " start");
 
         String fileName = Paths.get(parameters.getOutputFolder(), task.getFileName()).toString();
-
-//        String disposition = httpURLConnection.getHeaderField("Content-Disposition");
-//        String contentType = httpURLConnection.getContentType();
 
         final long contentLength = connection.getContentLength();
         final long sleepTimeNanoSec = 1_000_000;
@@ -235,8 +225,9 @@ public class Downloader {
                     //increase buffer size for compensation latency
 //                    long theoreticalSpeed = numBytesRead / timer * CONVERT_NANO_TO_SECONDS;
 
-                    currentBuffer = middleSpeedOneThread * timer / CONVERT_NANO_TO_SECONDS ;
-                    currentBuffer = inputBufferOneThread >= currentBuffer ? inputBufferOneThread : currentBuffer > middleSpeedOneThread ? middleSpeedOneThread : currentBuffer;
+//                    currentBuffer = middleSpeedOneThread * timer / CONVERT_NANO_TO_SECONDS ;
+//                    currentBuffer = inputBufferOneThread >= currentBuffer ? inputBufferOneThread : currentBuffer > middleSpeedOneThread ? middleSpeedOneThread : currentBuffer;
+
                     //todo max buffersize = bucket size
 //                    currentBuffer = theoreticalSpeed < middleSpeedOneThread ? (long) (1.5 * currentBuffer) : (long) (0.9 * currentBuffer);
 //                    System.out.println(currentBuffer);

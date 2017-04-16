@@ -1,7 +1,5 @@
 package cherkasov.com;
 
-import org.apache.commons.cli.ParseException;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,9 +69,11 @@ public class Manager {
         }
 
         workingTime = System.currentTimeMillis();
+
         //create downloader instance
         final Downloader downloader = new Downloader(queueTasks, parameters, Downloader.ConnectionType.HTTP);
         downloader.start();
+
         workingTime = (System.currentTimeMillis() - workingTime) / 1000; // in seconds
 
         System.out.println(MessageFormat.format(
@@ -86,10 +86,8 @@ public class Manager {
                 "Total downloaded: {0} byte ({1} MegaByte), average speed: {2} byte/sec",
                 downloadedBytes,
                 downloadedBytes / 1024 / 1024,
-                downloadedBytes / (workingTime)));
+                downloadedBytes / workingTime));
         LOG.log(Level.INFO, "Program ended");
-        //return bytes from atomic
 
-//        return downloader.getDownloadedBytesSummary().get();
     }
 }
