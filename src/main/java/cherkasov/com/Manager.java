@@ -12,10 +12,40 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
+/*
+using
+java -jar utility.jar -n 5 -l 2000k -o output_folder -f links.txt
+
+    -n количество одновременно качающих потоков (1,2,3,4....)
+    -l общее ограничение на скорость скачивания, для всех потоков,
+    размерность - байт/секунда, можно использовать суффиксы k,m (k=1024, m=1024*1024)
+    -f путь к файлу со списком ссылок
+    -o имя папки, куда складывать скачанные файлы
+
+В конце работы утилита должна выводить статистику - время работы и количество скачанных байт.
+
+Формат файла со ссылками:
+<HTTP ссылка><пробел><имя файла, под которым его надо сохранить>
+
+пример:
+http://example.com/archive.zip my_archive.zip
+http://example.com/image.jpg picture.jpg
+*/
+// added key "-d" for debug messages
+
+
 public class Manager {
     private final String[] args;
     private long workingTime = 0L;
 
+    public static void main(String[] args) {
+        Manager manager = new Manager(args);
+
+        manager.execute();
+
+        LOG.log(Level.INFO, "End programm");
+
+    }
 
     public Manager(String[] args) {
         this.args = args;
@@ -23,9 +53,7 @@ public class Manager {
 
     public void execute() {
 
-        LOG.setLevel(Level.SEVERE);
-
-        LOG.log(Level.INFO, "Program started");
+        LOG.setLevel(Level.WARNING);
 
         //parsing parameters
         final ParserParameters parserParameters = new ParserParameters(args);
@@ -34,6 +62,10 @@ public class Manager {
         if (parameters == null) {
             LOG.log(Level.WARNING, "Parameters incorrect.");
             System.exit(1);
+        }
+
+        if (parameters.isDebug()) {
+            LOG.setLevel(Level.INFO);
         }
 
         //parsing links file
@@ -64,7 +96,7 @@ public class Manager {
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Create Directory Exception. " + e.getMessage());
                 e.printStackTrace();
-                System.exit(3);
+                System.exit(4);
             }
         }
 
@@ -74,11 +106,11 @@ public class Manager {
         final Downloader downloader = new Downloader(queueTasks, parameters, Downloader.ConnectionType.HTTP);
         downloader.start();
 
-        workingTime = (System.currentTimeMillis() - workingTime) / 1000; // in seconds
+        workingTime = System.currentTimeMillis() - workingTime;
 
         System.out.println(MessageFormat.format(
                 "Time spent for all tasks: {0} seconds",
-                workingTime));
+                workingTime / 1000));
 
         long downloadedBytes = downloader.getDownloadedBytesSummary().get();
 
@@ -86,8 +118,6 @@ public class Manager {
                 "Total downloaded: {0} byte ({1} MegaByte), average speed: {2} byte/sec",
                 downloadedBytes,
                 downloadedBytes / 1024 / 1024,
-                downloadedBytes / workingTime));
-        LOG.log(Level.INFO, "Program ended");
-
+                downloadedBytes * 1000 / workingTime ));
     }
 }

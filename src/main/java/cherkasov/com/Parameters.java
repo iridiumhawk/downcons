@@ -1,10 +1,10 @@
 package cherkasov.com;
 
 public class Parameters {
-    private int numberOfThreads ;
-    private long maxDownloadSpeed ; //bytes in second
-    private String fileNameWithLinks;
-    private String outputFolder ;
+    private final int numberOfThreads ;
+    private final long maxDownloadSpeed ; //bytes in second
+    private final String fileNameWithLinks;
+    private final String outputFolder ;
     private boolean debug = false;
 
     public Parameters(int numberOfThreads, long maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {

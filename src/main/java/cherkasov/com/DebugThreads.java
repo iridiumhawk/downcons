@@ -1,7 +1,10 @@
 package cherkasov.com;
 
 import java.text.MessageFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 
 public class DebugThreads {
 
@@ -15,12 +18,13 @@ public class DebugThreads {
 
     //for testing
     public void threadSpeedMonitor() {
-        if (! debugState) return;
+        if (!debugState) return;
 
-        Thread threadMonitor = new Thread(() -> {
+        Runnable runner = () -> {
             long previousBytes = 0;
 
-            while (true) {
+            do {
+
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
@@ -30,10 +34,16 @@ public class DebugThreads {
                 System.out.println(MessageFormat.format("Speed: {0}; bucket: {1}", downloader.getDownloadedBytesSummary().longValue() - previousBytes, downloader.getBucketForAllThreads().get()));
 
                 previousBytes = downloader.getDownloadedBytesSummary().longValue();
-            }
-        });
+            } while (downloader.getIsAlive());
+        };
 
-        threadMonitor.start();
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+
+        service.execute(runner);
+
+        service.shutdown();
     }
+
 }
 

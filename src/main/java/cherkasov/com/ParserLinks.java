@@ -26,9 +26,8 @@ public class ParserLinks {
             throw  new FileNotFoundException("File with links does not exist.");
         }
 
-        List<String> lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+        return Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
 
-        return lines;
     }
 
 

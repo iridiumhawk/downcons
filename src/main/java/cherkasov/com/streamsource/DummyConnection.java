@@ -16,7 +16,6 @@ public class DummyConnection implements Connection {
 
     @Override
     public void disconnect() {
-
     }
 
     @Override

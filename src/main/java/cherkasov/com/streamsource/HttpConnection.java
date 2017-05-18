@@ -23,7 +23,7 @@ public class HttpConnection implements Connection {
     @Override
     public boolean connect() {
 
-        if (url == null) {
+        if (url == null || url.equals("")) {
             return false;
         }
 

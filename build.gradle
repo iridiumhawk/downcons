@@ -1,15 +1,16 @@
 group 'cherkasov.com'
-version '0.99'
+//version '0.99'
 
 apply plugin: "java"
 apply plugin: "application"
 
-mainClassName = "cherkasov.com.Main"
+mainClassName = "cherkasov.com.Manager"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 

@@ -1,10 +1,9 @@
 package cherkasov.com;
 
-import java.io.IOException;
 import java.util.logging.*;
 
 public class ProjectLogger {
-    public static final Logger LOG = ProjectLogger.initFileLogging(Main.class.getSimpleName());
+    public static final Logger LOG = ProjectLogger.initFileLogging(Manager.class.getSimpleName());
 
     private static final String LOG_FILE_NAME = "downloader.log";
     private static final int LIMIT_LOG_FILE_SIZE = 1000000; // 1 Mb
@@ -17,19 +16,21 @@ public class ProjectLogger {
 
         logger.setLevel(LOGGER_LEVEL);
 
-        FileHandler fileHandler;
-
         // Create txt Formatter
         SimpleFormatter formatterTxt = new SimpleFormatter();
+
+// disable file logger
+/*        FileHandler fileHandler;
 
         try {
             fileHandler = new FileHandler(LOG_FILE_NAME, LIMIT_LOG_FILE_SIZE, 1, true);
             fileHandler.setFormatter(formatterTxt);
+
             logger.addHandler(fileHandler);
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         //console formatter
         Handler consoleHandler = new ConsoleHandler();
