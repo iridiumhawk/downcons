@@ -3,6 +3,12 @@ package cherkasov.com.streamsource;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Dummy
+ * For test purposes only
+ * All methods return false or null
+ */
+
 public class DummyConnection implements Connection {
     @Override
     public long getContentLength() {

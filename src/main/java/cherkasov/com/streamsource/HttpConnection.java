@@ -11,6 +11,10 @@ import static cherkasov.com.ProjectLogger.LOG;
 /**
  * Created by cherkasov on 09.03.17.
  */
+
+/**
+ * Connect to the given URL
+ */
 public class HttpConnection implements Connection {
     private HttpURLConnection httpURLConnection;
     private String url;

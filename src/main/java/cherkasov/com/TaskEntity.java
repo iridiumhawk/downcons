@@ -1,6 +1,10 @@
 package cherkasov.com;
 
-//task with url and file
+/**
+ * The entity that stores address and file name
+ * It is used to represent tasks in the queue
+ */
+
 public class TaskEntity {
     private final String url;
     private final String fileName;
@@ -18,7 +22,10 @@ public class TaskEntity {
         return fileName;
     }
 
-    //for unit testing
+    /**
+     *
+     * Override equals for uses in unit testing
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
