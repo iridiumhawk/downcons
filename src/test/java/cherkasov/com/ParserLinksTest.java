@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;

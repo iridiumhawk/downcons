@@ -34,7 +34,10 @@ http://example.com/image.jpg picture.jpg
 added key "-d" for debug messages
  */
 
-
+/**
+ * Entry point for application
+ * Manages all subtasks
+ */
 public class Manager {
     private final String[] args;
     private long workingTime = 0L;

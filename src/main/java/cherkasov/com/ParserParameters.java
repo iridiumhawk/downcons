@@ -6,7 +6,9 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
-//parsing command line parameters
+/**
+ * Processing command line parameters
+ */
 public class ParserParameters {
     private final String[] args;
 
@@ -26,6 +28,10 @@ public class ParserParameters {
         this.args = new String[0];
     }
 
+    /**
+     * Parses args from command line into Option
+     * @return Parameters
+     */
     public Parameters parseArgs() {
         // create Options object
         Options options = new Options();
@@ -151,15 +157,20 @@ public class ParserParameters {
                     default:
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
-                LOG.log(Level.INFO, "Index of parsing parameter out of array bounds");
+                LOG.log(Level.INFO, "Index of parameter out of array bounds");
             }
         }
 
-        LOG.log(Level.INFO, "Parsing command line parameters done");
+        LOG.log(Level.INFO, "Parsing of command line parameters was done");
 
         return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
     }
 
+    /**
+     * Checks arg for correctness
+     * @param arg - current parameter for checking
+     * @return arg without change if it is correct, else return empty string
+     */
     private String checkArg(String arg) {
         if (arg == null || "".equals(arg) || arg.charAt(0) == '-') {
             return "";
@@ -167,6 +178,12 @@ public class ParserParameters {
         return arg;
     }
 
+    /**
+     * Processing string into number except negative numbers
+     * May processing suffix k or K and m or M
+     * @param arg - string for processing
+     * @return long number correspondent to arg, else return 0L
+     */
     private long parseIntoNumber(String arg) {
 
         if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') {

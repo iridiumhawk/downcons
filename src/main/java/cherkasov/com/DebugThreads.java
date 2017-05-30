@@ -5,7 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-
+/**
+ * Debug some functionality
+ */
 public class DebugThreads {
 
     private final boolean debugState;
@@ -16,7 +18,10 @@ public class DebugThreads {
         this.downloader = downloader;
     }
 
-    //for testing
+    /**
+     * Thread for monitoring speed of downloading and bucket filling
+     * Prints info on console every second
+     */
     public void threadSpeedMonitor() {
         if (!debugState) return;
 
@@ -37,13 +42,11 @@ public class DebugThreads {
             } while (downloader.getIsAlive());
         };
 
-
         ExecutorService service = Executors.newSingleThreadExecutor();
 
         service.execute(runner);
 
         service.shutdown();
     }
-
 }
 

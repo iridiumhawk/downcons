@@ -131,7 +131,7 @@ public class Downloader {
     }
 
     /**
-     * Try put into bucket given amount of bytes
+     * Tries put into the bucket given amount of bytes
      * The number of bytes exceeding the limit <code>bucketMaxSize</code> will be discarded
      * @param updateValue - amount of byte for fill bucket
      */

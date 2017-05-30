@@ -21,7 +21,7 @@ import static cherkasov.com.ProjectLogger.LOG;
 
 
 /**
- * Test download fake files from memory stream
+ * Test download the fake files from memory stream
  */
 public class DownloaderTest {
     private ConcurrentLinkedQueue<TaskEntity> queueTasks;
@@ -34,7 +34,7 @@ public class DownloaderTest {
     private Path output;
 
     /**
-     * Fill queue with tasks that have fake urls and file names
+     * Fill the queue with tasks that have fake urls and file names
      * Create temp dir for downloaded files
      */
     @Before
@@ -51,6 +51,10 @@ public class DownloaderTest {
 
     }
 
+    /**
+     * Remove temp directory after tests
+     * @throws IOException
+     */
     @After
     public void tearDown() throws IOException {
         removeDirectory(output.toFile());

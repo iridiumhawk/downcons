@@ -8,25 +8,25 @@ import java.io.InputStream;
  */
 public interface Connection {
     /**
-     *
+     * Get content length
      * @return length of content from input source
      */
     long getContentLength();
 
     /**
-     *
+     * Get input stream
      * @return input stream for established connection
      * @throws IOException if input stream is not available
      */
     InputStream getInputStream() throws IOException;
 
     /**
-     * close current connection
+     * Closes current connection
      */
     void disconnect();
 
     /**
-     *
+     * Get status of connection
      * @return status of connection
      */
     boolean isConnected();

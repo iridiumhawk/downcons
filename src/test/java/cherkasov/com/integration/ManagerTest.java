@@ -4,6 +4,10 @@ import cherkasov.com.Manager;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.logging.Level;
+
+import static cherkasov.com.ProjectLogger.LOG;
+
 /**
  *
  * Integration test of full functionality
@@ -16,5 +20,8 @@ public class ManagerTest {
     @Test
     public void testMainArgsFullCorrect() throws Exception {
         Manager.main(ARGS_ALL_FULL_CORRECT);
+
+        LOG.log(Level.INFO, "ManagerTest pass");
+
     }
 }

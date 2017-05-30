@@ -10,16 +10,22 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
-//parsing file with links and put them in tasks queue
+/**
+ *
+ * Parses file with links and put them in tasks queue
+ */
 public class ParserLinks {
     private final String fileName;
 
-
     public ParserLinks(String fileName) {
         this.fileName = fileName;
-
     }
 
+    /**
+     * Loads a file with links and splits it into lines
+     * @return list of lines from file
+     * @throws IOException if file does not exist
+     */
     public List<String> loadFile() throws IOException {
 
         if (!Files.exists(Paths.get(fileName))) {
@@ -27,10 +33,13 @@ public class ParserLinks {
         }
 
         return Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
-
     }
 
-
+    /**
+     * Adds tasks into queue
+     * @param lines - list with url and file name
+     * @return task queue
+     */
     public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines)  {
 
         if (lines == null) {
@@ -41,7 +50,7 @@ public class ParserLinks {
 
         for (String line : lines) {
 
-            //if line is fewer than 12 chars length, then this line is useless
+            //if line is fewer than 12 chars length, then line is useless
             if (line.length() < 12) {
                 continue;
             }
@@ -59,7 +68,7 @@ public class ParserLinks {
             }
         }
 
-        LOG.log(Level.INFO, "Parsing file with links done");
+        LOG.log(Level.INFO, "Parsing file with links was done");
 
         return queueTasks;
     }
