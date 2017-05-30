@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import static cherkasov.com.ProjectLogger.LOG;
 
 public class Downloader {
+
     private final ConcurrentLinkedQueue<TaskEntity> queueThreadTasks;
     private final Parameters parameters;
     private final DebugThreads debugThreads;
@@ -200,7 +201,7 @@ public class Downloader {
     private Connection getConnection(String url) {
         switch (connectionType) {
             case FAKE:
-                return new FakeConnection(new FakeHttpServer(10000000));
+                return new FakeConnection(new FakeHttpServer(10_000_000));
             case HTTP:
                 return new HttpConnection(url);
         }
@@ -284,11 +285,6 @@ public class Downloader {
                         task.getUrl()));
     }
 
-    enum ConnectionType {
-        HTTP,
-        FAKE,
-        DUMMY
-    }
 }
 
 

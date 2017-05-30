@@ -12,7 +12,7 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
-/*
+/**
 using
 java -jar utility.jar -n 5 -l 2000k -o output_folder -f links.txt
 
@@ -30,8 +30,9 @@ java -jar utility.jar -n 5 -l 2000k -o output_folder -f links.txt
 пример:
 http://example.com/archive.zip my_archive.zip
 http://example.com/image.jpg picture.jpg
-*/
-// added key "-d" for debug messages
+
+added key "-d" for debug messages
+ */
 
 
 public class Manager {
@@ -43,7 +44,7 @@ public class Manager {
 
         manager.execute();
 
-        LOG.log(Level.INFO, "End programm");
+        LOG.log(Level.INFO, "End program");
 
     }
 
@@ -103,7 +104,7 @@ public class Manager {
         workingTime = System.currentTimeMillis();
 
         //create downloader instance
-        final Downloader downloader = new Downloader(queueTasks, parameters, Downloader.ConnectionType.HTTP);
+        final Downloader downloader = new Downloader(queueTasks, parameters, ConnectionType.HTTP);
         downloader.start();
 
         workingTime = System.currentTimeMillis() - workingTime;
