@@ -6,7 +6,6 @@ import cherkasov.com.Parameters;
 import cherkasov.com.TaskEntity;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,7 +20,8 @@ import static cherkasov.com.ProjectLogger.LOG;
 
 
 /**
- * Test download the fake files from memory stream
+ * Test download the fake files from memory stream.
+ * Ignored by gradle. Must be started manually.
  */
 public class DownloaderTest {
     private ConcurrentLinkedQueue<TaskEntity> queueTasks;

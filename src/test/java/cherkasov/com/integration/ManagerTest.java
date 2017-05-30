@@ -10,7 +10,8 @@ import static cherkasov.com.ProjectLogger.LOG;
 
 /**
  *
- * Integration test of full functionality
+ * Integration test of full functionality.
+ * Ignored by gradle. Must be started manually.
  */
 
 public class ManagerTest {
