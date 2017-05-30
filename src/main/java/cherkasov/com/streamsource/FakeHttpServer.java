@@ -4,9 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 /**
- * Created by cherkasov on 09.03.17.
- */
-/**
  * Emulates the HTTP server and returns the data stream from memory
  */
 
@@ -16,7 +13,7 @@ public class FakeHttpServer extends ByteArrayInputStream {
     /**
      * Create new buffer <code>buf</code> in memory
      * Set size of buffer
-     * @param bufferSize for create new buffer
+     * @param bufferSize for set size of new buffer
      */
     public FakeHttpServer(int bufferSize) {
         super(new byte[bufferSize]);
@@ -25,7 +22,7 @@ public class FakeHttpServer extends ByteArrayInputStream {
     }
 
     /**
-     * Fill buffer with static data (255)
+     * Fill buffer with static data (byte 255)
      * @return the full byte array
      */
     private byte[] getBuffer() {

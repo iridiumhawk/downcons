@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by cherkasov on 09.03.17.
- */
-
-/**
- * Connection that return input stream from memory buffer
+ * Connection for input stream from memory buffer
  */
 public class FakeConnection implements Connection {
     private InputStream inputStream;

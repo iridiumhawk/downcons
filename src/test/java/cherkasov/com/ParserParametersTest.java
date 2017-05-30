@@ -7,6 +7,10 @@ import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests correct parsing of command line parameters
+ */
+
 public class ParserParametersTest {
     private ParserParameters parser;
 

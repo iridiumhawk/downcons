@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by cherkasov on 09.03.17.
+ * API for connection to input source
  */
 public interface Connection {
     /**
@@ -15,7 +15,7 @@ public interface Connection {
 
     /**
      *
-     * @return input stream of established connection
+     * @return input stream for established connection
      * @throws IOException if input stream is not available
      */
     InputStream getInputStream() throws IOException;
@@ -33,7 +33,7 @@ public interface Connection {
 
     /**
      * Connect to given source
-     * @return true if connection established
+     * @return <code>true</code> if connection established
      */
     boolean connect();
 }

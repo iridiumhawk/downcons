@@ -1,5 +1,8 @@
 package cherkasov.com;
 
+/**
+ * Stores command line parameters
+ */
 public class Parameters {
     private final int numberOfThreads ;
     private final long maxDownloadSpeed ; //bytes in second

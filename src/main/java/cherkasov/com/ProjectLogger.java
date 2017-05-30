@@ -5,8 +5,8 @@ import java.util.logging.*;
 public class ProjectLogger {
     public static final Logger LOG = ProjectLogger.initFileLogging(Manager.class.getSimpleName());
 
-    private static final String LOG_FILE_NAME = "downloader.log";
-    private static final int LIMIT_LOG_FILE_SIZE = 1000000; // 1 Mb
+//    private static final String LOG_FILE_NAME = "downloader.log";
+//    private static final int LIMIT_LOG_FILE_SIZE = 1000000; // 1 Mb
     private static final Level LOGGER_LEVEL = Level.OFF;
 
     //todo change format logger

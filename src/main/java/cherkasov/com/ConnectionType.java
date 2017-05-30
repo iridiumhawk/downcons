@@ -1,10 +1,9 @@
 package cherkasov.com;
 
 /**
- * Created by alex on 30.05.2017.
+ * Type of connection
  */
 public enum ConnectionType {
     HTTP,
-    FAKE,
-    DUMMY
+    FAKE
 }

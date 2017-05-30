@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.junit.Assert.*;
 
 /**
- * Created by hawk on 08.02.2017.
+ * Tests correct parsing links file
  */
 public class ParserLinksTest {
     private ParserLinks parserLinks;

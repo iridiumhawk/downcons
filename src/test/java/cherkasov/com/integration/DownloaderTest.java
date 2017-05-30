@@ -30,6 +30,7 @@ public class DownloaderTest {
     private final int maxDownloadSpeed = 5000000;
     private final int numberOfThreads = 5;
     private final String filenameWithLinks = "links.txt";
+    private final String folderName = "output";
     private Path output;
 
     /**
@@ -44,7 +45,7 @@ public class DownloaderTest {
             queueTasks.add(new TaskEntity("http://" + i, i + ".txt"));
         }
 
-        output = Files.createTempDirectory("output");
+        output = Files.createTempDirectory(folderName);
 
         parameters = new Parameters(numberOfThreads, maxDownloadSpeed, filenameWithLinks, output.toString(), true);
 

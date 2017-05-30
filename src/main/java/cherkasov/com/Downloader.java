@@ -14,6 +14,9 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
+/**
+ * Download files from given source through multiple threads
+ */
 public class Downloader {
 
     private final ConcurrentLinkedQueue<TaskEntity> queueThreadTasks;
@@ -24,7 +27,6 @@ public class Downloader {
     private final long middleSpeedOneThread;
     private final long inputBufferOneThread;
 
-    //    private  Thread bucketFillThread;
     private AtomicBoolean isAlive = new AtomicBoolean(true);
     private final AtomicLong downloadedBytesSummary = new AtomicLong(0L); //volatile
     private final AtomicLong bucketForAllThreads = new AtomicLong(0L);
@@ -78,7 +80,9 @@ public class Downloader {
         spentTimeSummary.getAndAdd(time);
     }
 
-
+    /**
+     * Start debug and bucket threads, then start main thread pool
+     */
     public void start() {
         //run debug
         debugThreads.threadSpeedMonitor();
@@ -92,7 +96,10 @@ public class Downloader {
     }
 
 
-    //Token Bucket Algorithm
+    /**
+     * Token Bucket Algorithm
+     * Fills bucket with delay <code>timeToSleepBeforeFill</code> by <code>valueOfFilling</code> bytes
+     */
     private void threadBucketFill() {
 
 //        bucketFillThread = new Thread(
@@ -114,8 +121,6 @@ public class Downloader {
                     LOG.log(Level.WARNING, "threadBucketFill InterruptedException");
                 }
             }
-
-
         };
 
         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -126,9 +131,9 @@ public class Downloader {
     }
 
     /**
-     * Increase current level of bucket with given bytes
-     *
-     * @param updateValue - increase by this value
+     * Try put into bucket given amount of bytes
+     * The number of bytes exceeding the limit <code>bucketMaxSize</code> will be discarded
+     * @param updateValue - amount of byte for fill bucket
      */
     private void increaseBucket(final long updateValue) {
 
@@ -152,7 +157,10 @@ public class Downloader {
         return true;
     }
 
-    //launch all threads
+    /**
+    * Pool executor for launch all worker threads
+    *
+    */
     private void threadsExecutor(final int threadCounter) {
 
         final CountDownLatch latch = new CountDownLatch(threadCounter);
@@ -189,15 +197,18 @@ public class Downloader {
             LOG.log(Level.WARNING, "InterruptedException, " + e.getMessage());
         }
 
-
         setIsAlive(false);
 
         service.shutdown();
 
-
         LOG.log(Level.INFO, MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds", getSpentTimeSummary()  / CONVERT_NANO_TO_SECONDS));
     }
 
+    /**
+     * Get connection to the given source
+     * @param url - URL for HTTP connection
+     * @return Connection
+     */
     private Connection getConnection(String url) {
         switch (connectionType) {
             case FAKE:
@@ -209,6 +220,12 @@ public class Downloader {
         return new DummyConnection();
     }
 
+    /**
+     * Download file from given source
+     * @param task - link to file on server and name of file on disk
+     * @param connection - from where download file
+     * @param nameThread - name of thread fo logging
+     */
     private void downloadFile(TaskEntity task, Connection connection, String nameThread) {
 
         if (!connection.connect()) {

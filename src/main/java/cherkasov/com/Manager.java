@@ -56,7 +56,7 @@ public class Manager {
 
         LOG.setLevel(Level.WARNING);
 
-        //parsing parameters
+        //parsing command line parameters
         final ParserParameters parserParameters = new ParserParameters(args);
         final Parameters parameters = parserParameters.parseArgs();
 
