@@ -90,10 +90,16 @@ public class Manager {
         //get output folder
         Path dir = Paths.get(parameters.getOutputFolder());
 
-        //check for exist and create output folder
-        if (!Files.isDirectory(dir)) {
+        //check for exist and create output folder if needed
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
             try {
                 Files.createDirectory(dir);
+                LOG.log(Level.INFO, "Created Directory. " + dir.getFileName());
+            } catch (SecurityException sec) {
+                LOG.log(Level.SEVERE, "Create Directory SecurityException. " + sec.getMessage());
+                sec.printStackTrace();
+                System.exit(4);
+
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Create Directory Exception. " + e.getMessage());
                 e.printStackTrace();
