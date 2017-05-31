@@ -35,7 +35,7 @@ public class DownloaderTest {
 
     /**
      * Fill the queue with tasks that have fake urls and file names
-     * Create temp dir for downloaded files
+     * Creates temp dir for downloaded files
      */
     @Before
     public void setUp() throws IOException {
@@ -52,7 +52,7 @@ public class DownloaderTest {
     }
 
     /**
-     * Remove temp directory after tests
+     * Removes temp directory after tests finished
      * @throws IOException
      */
     @After
@@ -61,8 +61,8 @@ public class DownloaderTest {
     }
 
     /**
-     * Remove a non empty directory
-     * @param dir directory for remove
+     * Removes a non empty directory
+     * @param dir directory name for remove
      */
     public static void removeDirectory(File dir) {
         if (dir.isDirectory()) {
@@ -79,7 +79,7 @@ public class DownloaderTest {
     }
 
     /**
-     * Download files and check that summary bytes equals (tasksCount * 10 000 000 bytes per task)
+     * Downloads files and checks that summary bytes equals  == tasksCount * 10 000 000 bytes per task
      */
     @Test
     public void start() {

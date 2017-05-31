@@ -12,7 +12,7 @@ import static cherkasov.com.ProjectLogger.LOG;
 
 /**
  *
- * Parses file with links and put them in tasks queue
+ * Parses the file with links and put them in the tasks queue
  */
 public class ParserLinks {
     private final String fileName;
@@ -22,9 +22,9 @@ public class ParserLinks {
     }
 
     /**
-     * Loads a file with links and splits it into lines
-     * @return list of lines from file
-     * @throws IOException if file does not exist
+     * Loads the file with links and splits it into the lines
+     * @return      a list of lines reading from the file
+     * @throws      IOException if the file does not exist
      */
     public List<String> loadFile() throws IOException {
 
@@ -36,9 +36,10 @@ public class ParserLinks {
     }
 
     /**
-     * Adds tasks into queue
-     * @param lines - list with url and file name
-     * @return task queue
+     * Adds tasks into a queue
+     * @param lines     the list with url and file name per line
+     * @return          a task queue for downloading
+     * @throws          NullPointerException if lines is null
      */
     public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines)  {
 

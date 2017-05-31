@@ -35,8 +35,8 @@ added key "-d" for debug messages
  */
 
 /**
- * Entry point for application
- * Manages all subtasks
+ * Entry point for application.
+ * Manages all subtasks.
  */
 public class Manager {
     private final String[] args;

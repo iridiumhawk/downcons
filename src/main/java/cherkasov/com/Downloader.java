@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import static cherkasov.com.ProjectLogger.LOG;
 
 /**
- * Download files from given source through multiple threads
+ * Downloads files from given source through multiple threads
  */
 public class Downloader {
 
@@ -26,17 +26,15 @@ public class Downloader {
     private final long bucketMaxSize;
     private final long middleSpeedOneThread;
     private final long inputBufferOneThread;
-
     private AtomicBoolean isAlive = new AtomicBoolean(true);
-    private final AtomicLong downloadedBytesSummary = new AtomicLong(0L); //volatile
+    private final AtomicLong downloadedBytesSummary = new AtomicLong(0L);
     private final AtomicLong bucketForAllThreads = new AtomicLong(0L);
     private final AtomicLong spentTimeSummary = new AtomicLong(0L);
 
     private final int CONVERT_NANO_TO_SECONDS = 1_000_000_000;
 
-    //how often thread will be managed (send request to server and get buffer), times in one second
+    //how often thread will be managed (sends request to a server and get a buffer), times in one second
     private final int GRANULARITY_OF_DOWNLOADING = 20;
-
 
     public Downloader(ConcurrentLinkedQueue<TaskEntity> queueTasks, Parameters parameters, ConnectionType connectionType) {
         this.queueThreadTasks = queueTasks;
@@ -48,7 +46,6 @@ public class Downloader {
         this.connectionType = connectionType;
         this.debugThreads = new DebugThreads(parameters.isDebug(), this);
     }
-
 
     public long getSpentTimeSummary() {
         return spentTimeSummary.get();
@@ -70,12 +67,12 @@ public class Downloader {
         return downloadedBytesSummary;
     }
 
-    //atomically add downloaded bytes to counter
+    //atomically adds the downloaded bytes to counter
     private void addDownloadedBytes(long bytes) {
         downloadedBytesSummary.getAndAdd(bytes);
     }
 
-    //atomically add time spent by thread to counter
+    //atomically adds the time spent by thread to counter
     private void addSpentTime(long time) {
         spentTimeSummary.getAndAdd(time);
     }
@@ -94,7 +91,6 @@ public class Downloader {
         threadsExecutor(parameters.getNumberOfThreads());
 
     }
-
 
     /**
      * Token Bucket Algorithm
@@ -301,7 +297,6 @@ public class Downloader {
                         nameThread,
                         task.getUrl()));
     }
-
 }
 
 

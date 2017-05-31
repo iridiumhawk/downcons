@@ -1,8 +1,9 @@
 package cherkasov.com;
 
 /**
- * The entity that stores address and file name
- * It is used to represent tasks in the queue
+ * The entity that stores address for downloading files and file name
+ * to store on filesystem
+ * It is used to represent tasks in the task queue
  */
 
 public class TaskEntity {
@@ -23,8 +24,7 @@ public class TaskEntity {
     }
 
     /**
-     *
-     * Override equals for uses in unit testing
+     * Uses for unit testing
      */
     @Override
     public boolean equals(Object o) {

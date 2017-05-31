@@ -7,18 +7,17 @@ import java.util.logging.Level;
 import static cherkasov.com.ProjectLogger.LOG;
 
 /**
- * Processing command line parameters
+ * Processing the command line parameters
  */
 public class ParserParameters {
     private final String[] args;
 
-    //command line keys
+    //command line keys with default value
     private final String NUMBER_OF_THREADS_KEY = "-n";
     private final String MAX_DOWNLOAD_SPEED_KEY = "-l";
     private final String FILE_NAME_WITH_LINKS_KEY = "-f";
     private final String OUTPUT_FOLDER_KEY = "-o";
     private final String DEBUG_KEY = "-d";
-
 
     public ParserParameters(String[] args) {
         this.args = args;
@@ -29,8 +28,8 @@ public class ParserParameters {
     }
 
     /**
-     * Parses args from command line into Option
-     * @return Parameters
+     * Parses the arguments from command line into a parameters
+     * @return      Parameters
      */
     public Parameters parseArgs() {
         // create Options object
@@ -74,7 +73,7 @@ public class ParserParameters {
 
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
-        String helpMessage = "downcons.jar options";
+        String helpMessage = "utility.jar options";
 
         // parse the command line arguments
         try {
@@ -100,6 +99,7 @@ public class ParserParameters {
         String fileNameWithLinks;
         String outputFolder;
 
+        //fills parameters if exist or prints the help otherwise
         if (cmd.hasOption("n") && cmd.hasOption("l") && cmd.hasOption("f") && cmd.hasOption("o")) {
             numberOfThreads = Integer.parseInt(cmd.getOptionValue("n"));
             maxDownloadSpeed = parseIntoNumber(cmd.getOptionValue("l"));
@@ -123,6 +123,10 @@ public class ParserParameters {
         }
     }
 
+    /**
+     * First version of parsing the command line into a parameters
+     * @return      parameters
+     */
     @Deprecated
     public Parameters parseArgsOld() {
 
@@ -168,8 +172,8 @@ public class ParserParameters {
 
     /**
      * Checks arg for correctness
-     * @param arg - current parameter for checking
-     * @return arg without change if it is correct, else return empty string
+     * @param arg   the current parameter for checking
+     * @return      the <code>arg</code> without change if it is correct, else return empty string
      */
     private String checkArg(String arg) {
         if (arg == null || "".equals(arg) || arg.charAt(0) == '-') {
@@ -179,10 +183,11 @@ public class ParserParameters {
     }
 
     /**
-     * Processing string into number except negative numbers
-     * May processing suffix k or K and m or M
-     * @param arg - string for processing
-     * @return long number correspondent to arg, else return 0L
+     * Processing the string into a number except negative numbers.
+     * Recognize suffix k or K as a factor 1024 (kilobyte) and m or M as a factor 1024*1024 (megabyte)
+     * @param arg   the string for processing
+     * @return      a number correspondent to arg or 0L if the string does not contain a
+     *             parsable number or it is negative
      */
     private long parseIntoNumber(String arg) {
 
