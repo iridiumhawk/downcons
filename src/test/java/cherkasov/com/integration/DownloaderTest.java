@@ -20,7 +20,7 @@ import static cherkasov.com.ProjectLogger.LOG;
 
 
 /**
- * Test download the fake files from memory stream.
+ * Tests downloading the fake files from memory stream.
  * Ignored by gradle. Must be started manually.
  */
 public class DownloaderTest {
@@ -34,7 +34,7 @@ public class DownloaderTest {
     private Path output;
 
     /**
-     * Fill the queue with tasks that have fake urls and file names
+     * Fills the queue with tasks that have fake urls and file names
      * Creates temp dir for downloaded files
      */
     @Before
@@ -53,16 +53,15 @@ public class DownloaderTest {
 
     /**
      * Removes temp directory after tests finished
-     * @throws IOException
      */
     @After
-    public void tearDown() throws IOException {
+    public void tearDown() {
         removeDirectory(output.toFile());
     }
 
     /**
      * Removes a non empty directory
-     * @param dir directory name for remove
+     * @param dir   directory name for remove
      */
     public static void removeDirectory(File dir) {
         if (dir.isDirectory()) {
@@ -79,7 +78,7 @@ public class DownloaderTest {
     }
 
     /**
-     * Downloads files and checks that summary bytes equals  == tasksCount * 10 000 000 bytes per task
+     * Downloads files and checks that summary bytes equals == tasksCount * 10 000 000 bytes per task
      */
     @Test
     public void start() {
