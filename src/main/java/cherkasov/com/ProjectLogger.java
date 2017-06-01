@@ -13,7 +13,7 @@ public class ProjectLogger {
     private static final Level LOGGER_LEVEL = Level.OFF;
 
     /**
-     * Initializes logger
+     * Initializes logger.
      * @param loggerName    name of logger
      * @return              instance of logger
      */
@@ -22,7 +22,6 @@ public class ProjectLogger {
         Logger logger = Logger.getLogger(loggerName);
 
         logger.setLevel(LOGGER_LEVEL);
-
 
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] %4$s: %2$s - %5$s%6$s%n");

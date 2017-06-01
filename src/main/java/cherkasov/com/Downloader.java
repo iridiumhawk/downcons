@@ -78,7 +78,7 @@ public class Downloader {
     }
 
     /**
-     * Start debug and bucket threads, then start main thread pool
+     * Starts debug and bucket threads, then starts main thread pool.
      */
     public void start() {
         //run debug
@@ -94,7 +94,8 @@ public class Downloader {
 
     /**
      * Token Bucket Algorithm
-     * Fills bucket with delay <code>timeToSleepBeforeFill</code> by <code>valueOfFilling</code> bytes
+     * Fills bucket. Uses delay <code>timeToSleepBeforeFill</code> for filling.
+     * Tries increase bucket by <code>valueOfFilling</code> bytes.
      */
     private void threadBucketFill() {
 
@@ -127,8 +128,8 @@ public class Downloader {
     }
 
     /**
-     * Tries put into the bucket given amount of bytes
-     * The number of bytes exceeding the limit <code>bucketMaxSize</code> will be discarded
+     * Tries put into the bucket given amount of bytes.
+     * The number of bytes exceeding the limit <code>bucketMaxSize</code> will be discarded.
      * @param updateValue - amount of byte for fill bucket
      */
     private void increaseBucket(final long updateValue) {
@@ -142,6 +143,11 @@ public class Downloader {
         });
     }
 
+    /**
+     * Decrease bucket on the given amount bytes.
+     * @param updateValue   amount of bytes to decrease bucket
+     * @return              true if success
+     */
     private synchronized boolean checkAndDecreaseBucket(final long updateValue) {
 
         if (bucketForAllThreads.get() < updateValue) {
@@ -154,9 +160,9 @@ public class Downloader {
     }
 
     /**
-    * Pool executor for launch all worker threads
-    *
-    */
+     * Pool executor for launch all worker threads.
+     * @param threadCounter     how many threads need to be used
+     */
     private void threadsExecutor(final int threadCounter) {
 
         final CountDownLatch latch = new CountDownLatch(threadCounter);
@@ -197,13 +203,15 @@ public class Downloader {
 
         service.shutdown();
 
-        LOG.log(Level.INFO, MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds", getSpentTimeSummary()  / CONVERT_NANO_TO_SECONDS));
+        LOG.log(Level.INFO,
+                MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds",
+                getSpentTimeSummary()  / CONVERT_NANO_TO_SECONDS));
     }
 
     /**
-     * Get connection to the given source
-     * @param url - URL for HTTP connection
-     * @return Connection
+     * Gets connection to the given source.
+     * @param url   URL for new HTTP connection
+     * @return      established Connection
      */
     private Connection getConnection(String url) {
         switch (connectionType) {
@@ -217,10 +225,10 @@ public class Downloader {
     }
 
     /**
-     * Download file from given source
-     * @param task - link to file on server and name of file on disk
-     * @param connection - from where download file
-     * @param nameThread - name of thread fo logging
+     * Downloads file from the given source.
+     * @param task          task for downloading (link to the file on server and the name of file on disk)
+     * @param connection    from where download file
+     * @param nameThread    name of thread for logging
      */
     private void downloadFile(TaskEntity task, Connection connection, String nameThread) {
 
@@ -238,7 +246,6 @@ public class Downloader {
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
 
-        //todo implement various strategy of download from internet
         // opens input stream from the HTTP connection
         try (
                 ReadableByteChannel readableByteChannel = Channels.newChannel(connection.getInputStream());
@@ -249,9 +256,8 @@ public class Downloader {
             long currentBuffer = inputBufferOneThread;
 
             while (true) {
-//                ByteBuffer bb = ByteBuffer.allocate((int)currentBuffer);
 
-                //use Token Bucket Algorithm
+                //uses Token Bucket Algorithm
                 if (checkAndDecreaseBucket(currentBuffer)) {
 
                     long timer = System.nanoTime();
@@ -282,16 +288,15 @@ public class Downloader {
             LOG.log(Level.WARNING, "Exception in downloader thread, " + e.getMessage());
         }
 
-
         connection.disconnect();
 
-        //time of each threads, summary time of all threads will be greater than time work for whole program
+        //time of each thread, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
 
-        System.out.println("File " + task.getUrl() + " downloaded");
+        System.out.println("File " + task.getUrl() + " was downloaded");
 
         LOG.log(Level.INFO,
-                MessageFormat.format("File {3} downloaded, bytes: {0} for time: {1} sec, by thread: {2}",
+                MessageFormat.format("File {3} was downloaded, bytes: {0} for time: {1} sec, by thread: {2}",
                         bytesDownloaded,
                         timeSpentByTask / CONVERT_NANO_TO_SECONDS,
                         nameThread,

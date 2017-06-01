@@ -36,7 +36,9 @@ public class DebugThreads {
                     System.out.println(e.getMessage());
                 }
 
-                System.out.println(MessageFormat.format("Speed: {0}; bucket: {1}", downloader.getDownloadedBytesSummary().longValue() - previousBytes, downloader.getBucketForAllThreads().get()));
+                System.out.println(MessageFormat.format("Speed: {0}; bucket: {1}",
+                        downloader.getDownloadedBytesSummary().longValue() - previousBytes,
+                        downloader.getBucketForAllThreads().get()));
 
                 previousBytes = downloader.getDownloadedBytesSummary().longValue();
             } while (downloader.getIsAlive());

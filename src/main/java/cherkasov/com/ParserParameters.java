@@ -28,8 +28,8 @@ public class ParserParameters {
     }
 
     /**
-     * Parses the arguments from command line into a parameters
-     * @return      Parameters
+     * Parses the arguments from command line into a parameters.
+     * @return      parameters
      */
     public Parameters parseArgs() {
         // create Options object
@@ -124,7 +124,7 @@ public class ParserParameters {
     }
 
     /**
-     * First version of parsing the command line into a parameters
+     * First version of parsing the command line into a parameters.
      * @return      parameters
      */
     @Deprecated
@@ -171,9 +171,9 @@ public class ParserParameters {
     }
 
     /**
-     * Checks arg for correctness
+     * Checks arg for correctness.
      * @param arg   the current parameter for checking
-     * @return      the <code>arg</code> without change if it is correct, else return empty string
+     * @return      the <code>arg</code> without change if it is correct, otherwise return empty string
      */
     private String checkArg(String arg) {
         if (arg == null || "".equals(arg) || arg.charAt(0) == '-') {
@@ -224,7 +224,7 @@ public class ParserParameters {
         try {
             resultInLong = Long.parseLong(resultString.toString()) * scale;
         } catch (NumberFormatException e) {
-            LOG.log(Level.WARNING, "Parsing into number fail. " + e.getMessage());
+            LOG.log(Level.WARNING, "Parsing into the number was fail. " + e.getMessage());
         }
 
         return resultInLong;

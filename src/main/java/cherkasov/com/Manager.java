@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import static cherkasov.com.ProjectLogger.LOG;
 
 /**
-using
 java -jar utility.jar -n 5 -l 2000k -o output_folder -f links.txt
 
     -n количество одновременно качающих потоков (1,2,3,4....)
@@ -90,10 +89,10 @@ public class Manager {
 
         final ConcurrentLinkedQueue<TaskEntity> queueTasks = parserLinks.parseLinks(stringsFromFile);
 
-        //get output folder
+        //gets output folder
         Path dir = Paths.get(parameters.getOutputFolder());
 
-        //check for exist and create output folder if needed
+        //checks for exist and creates output folder if needed
         if (!Files.exists(dir) || !Files.isDirectory(dir)) {
             try {
                 Files.createDirectory(dir);

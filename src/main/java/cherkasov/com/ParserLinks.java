@@ -22,7 +22,7 @@ public class ParserLinks {
     }
 
     /**
-     * Loads the file with links and splits it into the lines
+     * Loads the file with links and splits it into the lines.
      * @return      a list of lines reading from the file
      * @throws      IOException if the file does not exist
      */
@@ -36,7 +36,7 @@ public class ParserLinks {
     }
 
     /**
-     * Adds tasks into a queue
+     * Adds tasks into a queue.
      * @param lines     the list with url and file name per line
      * @return          a task queue for downloading
      * @throws          NullPointerException if lines is null
@@ -63,7 +63,7 @@ public class ParserLinks {
 
             String[] urlAndFileName = line.trim().split(" ");
 
-            //add tasks to concurrency queue, from which threads will take url for download
+            //adds tasks to concurrency queue, from which threads will take url for download
             if (urlAndFileName.length >= 2) {
                 queueTasks.add(new TaskEntity(urlAndFileName[0], urlAndFileName[1]));
             }
