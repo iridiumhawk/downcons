@@ -126,6 +126,7 @@ public class ParserParameters {
     /**
      * First version of parsing the command line into a parameters.
      * @return      parameters
+     * @deprecated
      */
     @Deprecated
     public Parameters parseArgsOld() {
