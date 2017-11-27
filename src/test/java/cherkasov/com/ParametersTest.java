@@ -15,12 +15,11 @@ public class ParametersTest {
     @Before
     public void setUp() throws Exception {
         parameters = new Parameters(10, 10, "links.txt", "output", true);
-
     }
 
     @Test
     public void isDebug() throws Exception {
-        assertEquals(true, parameters.isDebug());
+        assertTrue(parameters.isDebug());
     }
 
     @Test
@@ -52,7 +51,6 @@ public class ParametersTest {
 
         parameters = new Parameters(0, 0, null, "", false);
         assertEquals("links.txt", parameters.getFileNameWithLinks());
-
     }
 
     @Ignore
