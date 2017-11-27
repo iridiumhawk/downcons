@@ -12,8 +12,7 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
-/*
-using
+/**
 java -jar utility.jar -n 5 -l 2000k -o output_folder -f links.txt
 
     -n количество одновременно качающих потоков (1,2,3,4....)
@@ -30,10 +29,14 @@ java -jar utility.jar -n 5 -l 2000k -o output_folder -f links.txt
 пример:
 http://example.com/archive.zip my_archive.zip
 http://example.com/image.jpg picture.jpg
-*/
-// added key "-d" for debug messages
 
+added key "-d" for debug messages
+ */
 
+/**
+ * Entry point for application.
+ * Manages all subtasks.
+ */
 public class Manager {
     private final String[] args;
     private long workingTime = 0L;
@@ -43,7 +46,7 @@ public class Manager {
 
         manager.execute();
 
-        LOG.log(Level.INFO, "End programm");
+        LOG.log(Level.INFO, "End program");
 
     }
 
@@ -55,7 +58,7 @@ public class Manager {
 
         LOG.setLevel(Level.WARNING);
 
-        //parsing parameters
+        //parsing command line parameters
         final ParserParameters parserParameters = new ParserParameters(args);
         final Parameters parameters = parserParameters.parseArgs();
 
@@ -86,13 +89,19 @@ public class Manager {
 
         final ConcurrentLinkedQueue<TaskEntity> queueTasks = parserLinks.parseLinks(stringsFromFile);
 
-        //get output folder
+        //gets output folder
         Path dir = Paths.get(parameters.getOutputFolder());
 
-        //check for exist and create output folder
-        if (!Files.isDirectory(dir)) {
+        //checks for exist and creates output folder if needed
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
             try {
                 Files.createDirectory(dir);
+                LOG.log(Level.INFO, "Created Directory. " + dir.getFileName());
+            } catch (SecurityException sec) {
+                LOG.log(Level.SEVERE, "Create Directory SecurityException. " + sec.getMessage());
+                sec.printStackTrace();
+                System.exit(4);
+
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Create Directory Exception. " + e.getMessage());
                 e.printStackTrace();
@@ -103,7 +112,7 @@ public class Manager {
         workingTime = System.currentTimeMillis();
 
         //create downloader instance
-        final Downloader downloader = new Downloader(queueTasks, parameters, Downloader.ConnectionType.HTTP);
+        final Downloader downloader = new Downloader(queueTasks, parameters, ConnectionType.HTTP);
         downloader.start();
 
         workingTime = System.currentTimeMillis() - workingTime;

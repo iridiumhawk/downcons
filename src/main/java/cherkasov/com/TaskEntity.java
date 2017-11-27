@@ -1,6 +1,11 @@
 package cherkasov.com;
 
-//task with url and file
+/**
+ * The entity that stores address for downloading files and file name
+ * to store on filesystem
+ * It is used to represent tasks in the task queue
+ */
+
 public class TaskEntity {
     private final String url;
     private final String fileName;
@@ -18,7 +23,9 @@ public class TaskEntity {
         return fileName;
     }
 
-    //for unit testing
+    /**
+     * Uses for unit testing
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

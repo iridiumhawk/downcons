@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.junit.Assert.*;
 
 /**
- * Created by hawk on 08.02.2017.
+ * Tests correct parsing links file
  */
 public class ParserLinksTest {
     private ParserLinks parserLinks;

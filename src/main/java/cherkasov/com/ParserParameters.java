@@ -6,17 +6,18 @@ import java.util.logging.Level;
 
 import static cherkasov.com.ProjectLogger.LOG;
 
-//parsing command line parameters
+/**
+ * Processing the command line parameters
+ */
 public class ParserParameters {
     private final String[] args;
 
-    //command line keys
+    //command line keys with default value
     private final String NUMBER_OF_THREADS_KEY = "-n";
     private final String MAX_DOWNLOAD_SPEED_KEY = "-l";
     private final String FILE_NAME_WITH_LINKS_KEY = "-f";
     private final String OUTPUT_FOLDER_KEY = "-o";
     private final String DEBUG_KEY = "-d";
-
 
     public ParserParameters(String[] args) {
         this.args = args;
@@ -26,6 +27,10 @@ public class ParserParameters {
         this.args = new String[0];
     }
 
+    /**
+     * Parses the arguments from command line into a parameters.
+     * @return      parameters
+     */
     public Parameters parseArgs() {
         // create Options object
         Options options = new Options();
@@ -68,7 +73,7 @@ public class ParserParameters {
 
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
-        String helpMessage = "downcons.jar options";
+        String helpMessage = "utility.jar options";
 
         // parse the command line arguments
         try {
@@ -94,6 +99,7 @@ public class ParserParameters {
         String fileNameWithLinks;
         String outputFolder;
 
+        //fills parameters if exist or prints the help otherwise
         if (cmd.hasOption("n") && cmd.hasOption("l") && cmd.hasOption("f") && cmd.hasOption("o")) {
             numberOfThreads = Integer.parseInt(cmd.getOptionValue("n"));
             maxDownloadSpeed = parseIntoNumber(cmd.getOptionValue("l"));
@@ -117,6 +123,11 @@ public class ParserParameters {
         }
     }
 
+    /**
+     * First version of parsing the command line into a parameters.
+     * @return      parameters
+     * @deprecated
+     */
     @Deprecated
     public Parameters parseArgsOld() {
 
@@ -151,15 +162,20 @@ public class ParserParameters {
                     default:
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
-                LOG.log(Level.INFO, "Index of parsing parameter out of array bounds");
+                LOG.log(Level.INFO, "Index of parameter out of array bounds");
             }
         }
 
-        LOG.log(Level.INFO, "Parsing command line parameters done");
+        LOG.log(Level.INFO, "Parsing of command line parameters was done");
 
         return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
     }
 
+    /**
+     * Checks arg for correctness.
+     * @param arg   the current parameter for checking
+     * @return      the <code>arg</code> without change if it is correct, otherwise return empty string
+     */
     private String checkArg(String arg) {
         if (arg == null || "".equals(arg) || arg.charAt(0) == '-') {
             return "";
@@ -167,6 +183,13 @@ public class ParserParameters {
         return arg;
     }
 
+    /**
+     * Processing the string into a number except negative numbers.
+     * Recognize suffix k or K as a factor 1024 (kilobyte) and m or M as a factor 1024*1024 (megabyte)
+     * @param arg   the string for processing
+     * @return      a number correspondent to arg or 0L if the string does not contain a
+     *             parsable number or it is negative
+     */
     private long parseIntoNumber(String arg) {
 
         if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') {
@@ -202,7 +225,7 @@ public class ParserParameters {
         try {
             resultInLong = Long.parseLong(resultString.toString()) * scale;
         } catch (NumberFormatException e) {
-            LOG.log(Level.WARNING, "Parsing into number fail. " + e.getMessage());
+            LOG.log(Level.WARNING, "Parsing into the number was fail. " + e.getMessage());
         }
 
         return resultInLong;

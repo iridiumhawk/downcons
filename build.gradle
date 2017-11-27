@@ -19,7 +19,14 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     // https://mvnrepository.com/artifact/org.mockito/mockito-all
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+    //testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+}
+
+test {
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: $descriptor.className")
+    }
+    exclude 'cherkasov/com/integration/**'
 }
 
 jar {

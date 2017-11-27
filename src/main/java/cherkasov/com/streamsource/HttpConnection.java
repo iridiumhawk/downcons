@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import static cherkasov.com.ProjectLogger.LOG;
 
 /**
- * Created by cherkasov on 09.03.17.
+ * Connection to the given URL on HTTP server
  */
 public class HttpConnection implements Connection {
     private HttpURLConnection httpURLConnection;
