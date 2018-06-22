@@ -56,18 +56,16 @@ public class ParserLinksTest {
         List<String> lines = new ArrayList<>();
         lines.add("http m");
 
-        ConcurrentLinkedQueue<TaskEntity> queue = parserLinks.parseLinks(lines);
-        ConcurrentLinkedQueue<TaskEntity> actual = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<TaskEntity> actual = parserLinks.parseLinks(lines);
 
-        assertEquals(queue.isEmpty(), actual.isEmpty());
+        assertTrue(actual.isEmpty());
     }
 
     @Test
     public void testParseLinksEmptyQueueWithEmptyList() {
 
-        ConcurrentLinkedQueue<TaskEntity> queue = new ConcurrentLinkedQueue<>();
         ConcurrentLinkedQueue<TaskEntity> actual = parserLinks.parseLinks(new ArrayList<>());
 
-        assertEquals(queue.isEmpty(), actual.isEmpty());
+        assertTrue(actual.isEmpty());
     }
 }

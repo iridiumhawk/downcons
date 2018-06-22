@@ -23,7 +23,7 @@ public class ParametersTest {
 
     @Test
     public void isDebug() throws Exception {
-        assertEquals(true, parameters.isDebug());
+        assertTrue(parameters.isDebug());
     }
 
     @Test
