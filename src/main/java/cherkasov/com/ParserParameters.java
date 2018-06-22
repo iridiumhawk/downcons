@@ -18,6 +18,7 @@ public class ParserParameters {
     private final String FILE_NAME_WITH_LINKS_KEY = "-f";
     private final String OUTPUT_FOLDER_KEY = "-o";
     private final String DEBUG_KEY = "-d";
+    private final String version = "version: 0.99";
 
     public ParserParameters(String[] args) {
         this.args = args;
@@ -90,7 +91,7 @@ public class ParserParameters {
         }
 
         if (cmd.hasOption("v")) {
-            System.out.println("version: 0.99");
+            System.out.println(version);
             return null;
         }
 
@@ -128,6 +129,7 @@ public class ParserParameters {
      * @return      parameters
      * @deprecated
      */
+/*
     @Deprecated
     public Parameters parseArgsOld() {
 
@@ -170,6 +172,7 @@ public class ParserParameters {
 
         return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
     }
+*/
 
     /**
      * Checks arg for correctness.

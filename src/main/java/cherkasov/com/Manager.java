@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
@@ -73,21 +74,23 @@ public class Manager {
 
         //parsing links file
         final ParserLinks parserLinks = new ParserLinks(parameters.getFileNameWithLinks());
-        List<String> stringsFromFile = null;
+        List<String> stringsFromFile;
 
         try {
             stringsFromFile = parserLinks.loadFile();
         } catch (FileNotFoundException e) {
             LOG.log(Level.SEVERE, "Abort. Reason: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(2);
+//            e.printStackTrace();
+            return;
+//            System.exit(2);
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "Error reading links file. Reason: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(3);
+//            e.printStackTrace();
+            return;
+//            System.exit(3);
         }
 
-        final ConcurrentLinkedQueue<TaskEntity> queueTasks = parserLinks.parseLinks(stringsFromFile);
+        final Queue<TaskEntity> queueTasks = parserLinks.parseLinks(stringsFromFile);
 
         //gets output folder
         Path dir = Paths.get(parameters.getOutputFolder());
@@ -99,14 +102,16 @@ public class Manager {
                 LOG.log(Level.INFO, "Created Directory. " + dir.getFileName());
             } catch (SecurityException sec) {
                 LOG.log(Level.SEVERE, "Create Directory SecurityException. " + sec.getMessage());
-                sec.printStackTrace();
-                System.exit(4);
-
+//                sec.printStackTrace();
+//                System.exit(4);
+                    return;
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Create Directory Exception. " + e.getMessage());
-                e.printStackTrace();
-                System.exit(4);
+//                e.printStackTrace();
+//                System.exit(4);
+            return;
             }
+
         }
 
         workingTime = System.currentTimeMillis();

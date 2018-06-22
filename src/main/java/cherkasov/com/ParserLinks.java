@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
@@ -41,29 +42,29 @@ public class ParserLinks {
      * @return          a task queue for downloading
      * @throws          NullPointerException if lines is null
      */
-    public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines)  {
+    public Queue<TaskEntity> parseLinks(final List<String> lines)  {
 
         if (lines == null) {
             throw new NullPointerException("List of links is null.");
         }
 
-        final ConcurrentLinkedQueue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
+        final Queue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
 
         for (String line : lines) {
 
-            //if line is fewer than 12 chars length, then line is useless
+            //if line is fewer than 12 chars length, then line is useless because there are not urls
             if (line.length() < 12) {
                 continue;
             }
 
-            //comment line, go to next
+            //comment line, go to next line
             if (line.charAt(0) == '#') {
                 continue;
             }
 
             String[] urlAndFileName = line.trim().split(" ");
 
-            //adds tasks to concurrency queue, from which threads will take url for download
+            //adds tasks to concurrency queue, from which the threads will be take url for download
             if (urlAndFileName.length >= 2) {
                 queueTasks.add(new TaskEntity(urlAndFileName[0], urlAndFileName[1]));
             }
