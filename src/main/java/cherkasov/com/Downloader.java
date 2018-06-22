@@ -27,15 +27,15 @@ public class Downloader {
     private final long bucketMaxSize;
     private final long middleSpeedOneThread;
     private final long inputBufferOneThread;
-    private AtomicBoolean isAlive = new AtomicBoolean(true);
+    private final AtomicBoolean isAlive = new AtomicBoolean(true);
     private final AtomicLong downloadedBytesSummary = new AtomicLong(0L);
     private final AtomicLong bucketForAllThreads = new AtomicLong(0L);
     private final AtomicLong spentTimeSummary = new AtomicLong(0L);
 
-    private final int CONVERT_NANO_TO_SECONDS = 1_000_000_000;
+    private final static int CONVERT_NANO_TO_SECONDS = 1_000_000_000;
 
     //how often thread will be managed (sends request to a server and get a buffer), times in one second
-    private final int GRANULARITY_OF_DOWNLOADING = 20;
+    private final static int GRANULARITY_OF_DOWNLOADING = 20;
 
     public Downloader(Queue<TaskEntity> queueTasks, Parameters parameters, ConnectionType connectionType) {
         this.queueThreadTasks = queueTasks;
@@ -48,23 +48,23 @@ public class Downloader {
         this.debugThreads = new DebugThreads(parameters.isDebug(), this);
     }
 
-    public long getSpentTimeSummary() {
+    private long getSpentTimeSummary() {
         return spentTimeSummary.get();
     }
 
-    public boolean getIsAlive() {
+    protected boolean getIsAlive() {
         return isAlive.get();
     }
 
-    public void setIsAlive(boolean isAlive) {
+    private void setIsAlive(boolean isAlive) {
         this.isAlive.set(isAlive);
     }
 
-    public AtomicLong getBucketForAllThreads() {
+    protected AtomicLong getBucketForAllThreads() {
         return bucketForAllThreads;
     }
 
-    public AtomicLong getDownloadedBytesSummary() {
+    protected AtomicLong getDownloadedBytesSummary() {
         return downloadedBytesSummary;
     }
 
