@@ -32,8 +32,6 @@ public class Downloader {
     private final AtomicLong bucketForAllThreads = new AtomicLong(0L);
     private final AtomicLong spentTimeSummary = new AtomicLong(0L);
 
-    private final static int CONVERT_NANO_TO_SECONDS = 1_000_000_000;
-
     //how often thread will be managed (sends request to a server and get a buffer), times in one second
     private final static int GRANULARITY_OF_DOWNLOADING = 20;
 
@@ -199,7 +197,7 @@ public class Downloader {
 
         LOG.log(Level.INFO,
                 MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds",
-                getSpentTimeSummary()  / CONVERT_NANO_TO_SECONDS));
+                    TimeUnit.NANOSECONDS.toSeconds(getSpentTimeSummary())));
     }
 
     /**
@@ -288,7 +286,7 @@ public class Downloader {
         LOG.log(Level.INFO,
                 MessageFormat.format("File {3} was downloaded, bytes: {0} for time: {1} sec, by thread: {2}",
                         bytesDownloaded,
-                        timeSpentByTask / CONVERT_NANO_TO_SECONDS,
+                        TimeUnit.NANOSECONDS.toSeconds(timeSpentByTask),
                         nameThread,
                         task.getUrl()));
     }
