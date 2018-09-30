@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
@@ -41,13 +42,13 @@ public class ParserLinks {
      * @return          a task queue for downloading
      * @throws          NullPointerException if lines is null
      */
-    public ConcurrentLinkedQueue<TaskEntity> parseLinks(final List<String> lines)  {
+    public Queue<TaskEntity> parseLinks(final List<String> lines)  {
 
         if (lines == null) {
             throw new NullPointerException("List of links is null.");
         }
 
-        final ConcurrentLinkedQueue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
+        final Queue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
 
         for (String line : lines) {
 

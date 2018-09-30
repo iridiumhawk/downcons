@@ -5,6 +5,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static cherkasov.com.ProjectLogger.LOG;
+
 /**
  * Debug some functionality
  */
@@ -33,7 +35,7 @@ public class DebugThreads {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
-                    System.out.println(e.getMessage());
+                    LOG.warning(e.getMessage());
                 }
 
                 System.out.println(MessageFormat.format("Speed: {0}; bucket: {1}",

@@ -7,6 +7,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,7 +20,7 @@ import static cherkasov.com.ProjectLogger.LOG;
  */
 public class Downloader {
 
-    private final ConcurrentLinkedQueue<TaskEntity> queueThreadTasks;
+    private final Queue<TaskEntity> queueThreadTasks;
     private final Parameters parameters;
     private final DebugThreads debugThreads;
     private ConnectionType connectionType;
@@ -36,7 +37,7 @@ public class Downloader {
     //how often thread will be managed (sends request to a server and get a buffer), times in one second
     private final int GRANULARITY_OF_DOWNLOADING = 20;
 
-    public Downloader(ConcurrentLinkedQueue<TaskEntity> queueTasks, Parameters parameters, ConnectionType connectionType) {
+    public Downloader(Queue<TaskEntity> queueTasks, Parameters parameters, ConnectionType connectionType) {
         this.queueThreadTasks = queueTasks;
         this.parameters = parameters;
         this.middleSpeedOneThread = parameters.getMaxDownloadSpeed() / parameters.getNumberOfThreads();
