@@ -1,7 +1,7 @@
 package cherkasov.com;
 
 /**
- * Stores command line parameters
+ * Stores the command line parameters
  */
 public class Parameters {
     private final int numberOfThreads ;
@@ -13,6 +13,7 @@ public class Parameters {
     public Parameters(int numberOfThreads, long maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {
 
         //check and set default values if necessary
+        // TODO: 22.06.2018 change defaults on exception
         this.numberOfThreads = numberOfThreads > 0 ? numberOfThreads : 1;
         this.maxDownloadSpeed = maxDownloadSpeed > 0 ? maxDownloadSpeed : 1000000;
         this.fileNameWithLinks = (fileNameWithLinks == null || "".equals(fileNameWithLinks)) ? "links.txt" : fileNameWithLinks;

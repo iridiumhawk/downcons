@@ -52,19 +52,19 @@ public class ParserLinks {
 
         for (String line : lines) {
 
-            //if line is fewer than 12 chars length, then line is useless
+            //if line is fewer than 12 chars length, then line is useless because there are not urls
             if (line.length() < 12) {
                 continue;
             }
 
-            //comment line, go to next
+            //comment line, go to next line
             if (line.charAt(0) == '#') {
                 continue;
             }
 
             String[] urlAndFileName = line.trim().split(" ");
 
-            //adds tasks to concurrency queue, from which threads will take url for download
+            //adds tasks to concurrency queue, from which the threads will be take url for download
             if (urlAndFileName.length >= 2) {
                 queueTasks.add(new TaskEntity(urlAndFileName[0], urlAndFileName[1]));
             }

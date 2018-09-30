@@ -1,5 +1,6 @@
 package cherkasov.com;
 
+import java.util.Queue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class ParserLinksTest {
         List<String> lines = new ArrayList<>();
         lines.add("http://example.com/archive.zip my_archive.zip");
 
-        ConcurrentLinkedQueue<TaskEntity> queue = parserLinks.parseLinks(lines);
+        Queue<TaskEntity> queue = parserLinks.parseLinks(lines);
 
         TaskEntity actual = new TaskEntity("http://example.com/archive.zip", "my_archive.zip");
         assertEquals(queue.poll(), actual);
@@ -56,7 +57,7 @@ public class ParserLinksTest {
         List<String> lines = new ArrayList<>();
         lines.add("http m");
 
-        ConcurrentLinkedQueue<TaskEntity> actual = parserLinks.parseLinks(lines);
+        Queue<TaskEntity> actual = parserLinks.parseLinks(lines);
 
         assertTrue(actual.isEmpty());
     }
@@ -64,7 +65,7 @@ public class ParserLinksTest {
     @Test
     public void testParseLinksEmptyQueueWithEmptyList() {
 
-        ConcurrentLinkedQueue<TaskEntity> actual = parserLinks.parseLinks(new ArrayList<>());
+        Queue<TaskEntity> actual = parserLinks.parseLinks(new ArrayList<>());
 
         assertTrue(actual.isEmpty());
     }

@@ -27,15 +27,13 @@ public class Downloader {
     private final long bucketMaxSize;
     private final long middleSpeedOneThread;
     private final long inputBufferOneThread;
-    private AtomicBoolean isAlive = new AtomicBoolean(true);
+    private final AtomicBoolean isAlive = new AtomicBoolean(true);
     private final AtomicLong downloadedBytesSummary = new AtomicLong(0L);
     private final AtomicLong bucketForAllThreads = new AtomicLong(0L);
     private final AtomicLong spentTimeSummary = new AtomicLong(0L);
 
-    private final int CONVERT_NANO_TO_SECONDS = 1_000_000_000;
-
     //how often thread will be managed (sends request to a server and get a buffer), times in one second
-    private final int GRANULARITY_OF_DOWNLOADING = 20;
+    private final static int GRANULARITY_OF_DOWNLOADING = 20;
 
     public Downloader(Queue<TaskEntity> queueTasks, Parameters parameters, ConnectionType connectionType) {
         this.queueThreadTasks = queueTasks;
@@ -48,23 +46,23 @@ public class Downloader {
         this.debugThreads = new DebugThreads(parameters.isDebug(), this);
     }
 
-    public long getSpentTimeSummary() {
+    private long getSpentTimeSummary() {
         return spentTimeSummary.get();
     }
 
-    public boolean getIsAlive() {
+    protected boolean getIsAlive() {
         return isAlive.get();
     }
 
-    public void setIsAlive(boolean isAlive) {
+    private void setIsAlive(boolean isAlive) {
         this.isAlive.set(isAlive);
     }
 
-    public AtomicLong getBucketForAllThreads() {
+    protected AtomicLong getBucketForAllThreads() {
         return bucketForAllThreads;
     }
 
-    public AtomicLong getDownloadedBytesSummary() {
+    protected AtomicLong getDownloadedBytesSummary() {
         return downloadedBytesSummary;
     }
 
@@ -86,11 +84,10 @@ public class Downloader {
         debugThreads.threadSpeedMonitor();
 
         //start filling bucket
-        threadBucketFill();
+        executeBucketFillThread();
 
         //start threads
-        threadsExecutor(parameters.getNumberOfThreads());
-
+        executeDownloadsThreads(parameters.getNumberOfThreads());
     }
 
     /**
@@ -98,9 +95,8 @@ public class Downloader {
      * Fills bucket. Uses delay <code>timeToSleepBeforeFill</code> for filling.
      * Tries increase bucket by <code>valueOfFilling</code> bytes.
      */
-    private void threadBucketFill() {
+    private void executeBucketFillThread() {
 
-//        bucketFillThread = new Thread(
         Runnable runner = () -> {
 
             //todo implement various strategy of filling
@@ -122,9 +118,7 @@ public class Downloader {
         };
 
         ExecutorService service = Executors.newSingleThreadExecutor();
-
         service.execute(runner);
-
         service.shutdown();
     }
 
@@ -154,9 +148,7 @@ public class Downloader {
         if (bucketForAllThreads.get() < updateValue) {
             return false;
         }
-
         bucketForAllThreads.accumulateAndGet(updateValue, (current, given) -> current - given);
-
         return true;
     }
 
@@ -164,7 +156,7 @@ public class Downloader {
      * Pool executor for launch all worker threads.
      * @param threadCounter     how many threads need to be used
      */
-    private void threadsExecutor(final int threadCounter) {
+    private void executeDownloadsThreads(final int threadCounter) {
 
         final CountDownLatch latch = new CountDownLatch(threadCounter);
 
@@ -201,12 +193,11 @@ public class Downloader {
         }
 
         setIsAlive(false);
-
         service.shutdown();
 
         LOG.log(Level.INFO,
                 MessageFormat.format("Download was done.\nTime spent summary for all threads: {0} seconds",
-                getSpentTimeSummary()  / CONVERT_NANO_TO_SECONDS));
+                    TimeUnit.NANOSECONDS.toSeconds(getSpentTimeSummary())));
     }
 
     /**
@@ -274,11 +265,8 @@ public class Downloader {
                     }
 
                     timer = System.nanoTime() - timer;
-
                     timeSpentByTask += timer;
-
                     bytesDownloaded += numBytesRead;
-
                     addDownloadedBytes(numBytesRead);
                 }
 
@@ -293,13 +281,12 @@ public class Downloader {
 
         //time of each thread, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
-
         System.out.println("File " + task.getUrl() + " was downloaded");
 
         LOG.log(Level.INFO,
                 MessageFormat.format("File {3} was downloaded, bytes: {0} for time: {1} sec, by thread: {2}",
                         bytesDownloaded,
-                        timeSpentByTask / CONVERT_NANO_TO_SECONDS,
+                        TimeUnit.NANOSECONDS.toSeconds(timeSpentByTask),
                         nameThread,
                         task.getUrl()));
     }
