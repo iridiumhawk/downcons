@@ -28,8 +28,8 @@ public class ParserParametersTest {
     public void testParseArgsFullParams() throws Exception {
         final String[] argsFull = {"-n", "10", "-l", "1000k", "-f", "test.txt", "-o", "output", "-d"};
 
-        parser = new ParserParameters(argsFull);
-        Parameters parametersExpected = parser.parseArgs();
+        parser = new ParserParameters();
+        Parameters parametersExpected = parser.parseArgs(argsFull);
 
         Parameters parametersActual = new Parameters(10, 1024000, "test.txt", "output", true);
 
@@ -40,8 +40,8 @@ public class ParserParametersTest {
     public void testParseArgsNoParams() throws Exception {
         final String[] argsWithNoParam = {""};
 
-        parser = new ParserParameters(argsWithNoParam);
-        Parameters parametersExpected = parser.parseArgs();
+        parser = new ParserParameters();
+        Parameters parametersExpected = parser.parseArgs(argsWithNoParam);
 
         assertEquals(parametersExpected, null);
     }
@@ -50,8 +50,8 @@ public class ParserParametersTest {
     public void testParseArgsCracks() throws Exception {
         final String[] argsCrack = {"-n", "10", "-l", "1000", "-f", "-f", "test.txt", "-o", "output"};
 
-        parser = new ParserParameters(argsCrack);
-        Parameters parametersExpected = parser.parseArgs();
+        parser = new ParserParameters();
+        Parameters parametersExpected = parser.parseArgs(argsCrack);
 
         assertEquals(parametersExpected, null);
     }
@@ -60,8 +60,8 @@ public class ParserParametersTest {
     public void testParseArgsMissedParam() throws Exception {
         final String[] argsWithMissedParam = {"-n", "-l", "1000", "-f", "test.txt", "-o", "output"};
 
-        parser = new ParserParameters(argsWithMissedParam);
-        Parameters parametersExpected = parser.parseArgs();
+        parser = new ParserParameters();
+        Parameters parametersExpected = parser.parseArgs(argsWithMissedParam);
 
         assertEquals(parametersExpected, null);
     }
@@ -71,8 +71,8 @@ public class ParserParametersTest {
     public void testParseArgsFileNameEmpty() throws Exception {
         final String[] argsWithFileNameEmpty = {"-n", "10", "-l", "1000", "-f", "", "-o", " "};
 
-        parser = new ParserParameters(argsWithFileNameEmpty);
-        Parameters parametersExpected = parser.parseArgs();
+        parser = new ParserParameters();
+        Parameters parametersExpected = parser.parseArgs(argsWithFileNameEmpty);
 
         assertEquals(parametersExpected, null);
     }
@@ -81,8 +81,8 @@ public class ParserParametersTest {
     public void testParseArgsNotFull() throws Exception {
         final String[] argsNotFull = {"-f", "test.txt"};
 
-        parser = new ParserParameters(argsNotFull);
-        Parameters parametersExpected = parser.parseArgs();
+        parser = new ParserParameters();
+        Parameters parametersExpected = parser.parseArgs(argsNotFull);
 
         assertEquals(parametersExpected, null);
     }
