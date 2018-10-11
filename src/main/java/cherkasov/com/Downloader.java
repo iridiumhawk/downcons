@@ -34,6 +34,7 @@ public class Downloader {
 
     //how often thread will be managed (sends request to a server and get a buffer), times in one second
     private final static int GRANULARITY_OF_DOWNLOADING = 20;
+    private final long sleepTimeNanoSec = 100_000;
 
     public Downloader(Queue<TaskEntity> queueTasks, Parameters parameters, ConnectionType connectionType) {
         this.queueThreadTasks = queueTasks;
@@ -62,7 +63,7 @@ public class Downloader {
         return bucketForAllThreads;
     }
 
-    protected AtomicLong getDownloadedBytesSummary() {
+    public AtomicLong getDownloadedBytesSummary() {
         return downloadedBytesSummary;
     }
 
@@ -163,14 +164,13 @@ public class Downloader {
         Runnable runner = () -> {
 
             while (!queueThreadTasks.isEmpty()) {
-                try {
                     TaskEntity task = queueThreadTasks.poll();
+                try {
                     downloadFile(task,
                             getConnection(task.getUrl()),
                             Thread.currentThread().getName());
-
-                } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Download Exception, " + e.getMessage());
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, "Exception while download file " + task.getFileName() + ", " + e.getMessage());
                 }
             }
 
@@ -222,7 +222,7 @@ public class Downloader {
      * @param connection    from where download file
      * @param nameThread    name of thread for logging
      */
-    private void downloadFile(TaskEntity task, Connection connection, String nameThread) {
+    private void downloadFile(TaskEntity task, Connection connection, String nameThread) throws IOException {
 
         if (!connection.connect()) {
             LOG.log(Level.WARNING, "Connection is not established!");
@@ -234,15 +234,12 @@ public class Downloader {
         String fileName = Paths.get(parameters.getOutputFolder(), task.getFileName()).toString();
 
         final long contentLength = connection.getContentLength();
-        final long sleepTimeNanoSec = 100_000;
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
 
         // opens input stream from the HTTP connection
-        try (
-                ReadableByteChannel readableByteChannel = Channels.newChannel(connection.getInputStream());
-                FileOutputStream fileOutputStream = new FileOutputStream(fileName)
-        ) {
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(connection.getInputStream());
+             FileOutputStream fileOutputStream = new FileOutputStream(fileName)) {
 
             long numBytesRead;
             long currentBuffer = inputBufferOneThread;
@@ -273,15 +270,15 @@ public class Downloader {
                 TimeUnit.NANOSECONDS.sleep(sleepTimeNanoSec);
                 timeSpentByTask += sleepTimeNanoSec;
             }
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Exception in downloader thread, " + e.getMessage());
-        }
+            connection.disconnect();
 
-        connection.disconnect();
+        } catch (InterruptedException e) {
+            //ignore
+            //LOG.log(Level.WARNING, "Exception in downloader thread, " + e.getMessage());
+        }
 
         //time of each thread, summary time of all threads will be greater than time work for whole program
         addSpentTime(timeSpentByTask);
-        System.out.println("File " + task.getUrl() + " was downloaded");
 
         LOG.log(Level.INFO,
                 MessageFormat.format("File {3} was downloaded, bytes: {0} for time: {1} sec, by thread: {2}",

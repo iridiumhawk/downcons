@@ -1,5 +1,6 @@
 package cherkasov.com;
 
+import cherkasov.com.exceptions.IncorrectInputParameters;
 import org.apache.commons.cli.*;
 
 import java.util.logging.Level;
@@ -10,29 +11,19 @@ import static cherkasov.com.ProjectLogger.LOG;
  * Processing the command line parameters
  */
 public class ParserParameters {
-    private final String[] args;
 
-    //command line keys with default value
-    private final String NUMBER_OF_THREADS_KEY = "-n";
-    private final String MAX_DOWNLOAD_SPEED_KEY = "-l";
-    private final String FILE_NAME_WITH_LINKS_KEY = "-f";
-    private final String OUTPUT_FOLDER_KEY = "-o";
-    private final String DEBUG_KEY = "-d";
-    private final String version = "version: 0.99";
-
-    public ParserParameters(String[] args) {
-        this.args = args;
-    }
+    private final String version = "version: 1.0";
 
     public ParserParameters() {
-        this.args = new String[0];
+
     }
 
     /**
      * Parses the arguments from command line into a parameters.
      * @return      parameters
+     * @param args
      */
-    public Parameters parseArgs() {
+    public Parameters parseArgs(String[] args) throws IncorrectInputParameters {
         // create Options object
         Options options = new Options();
 
@@ -125,75 +116,13 @@ public class ParserParameters {
     }
 
     /**
-     * First version of parsing the command line into a parameters.
-     * @return      parameters
-     * @deprecated
-     */
-/*
-    @Deprecated
-    public Parameters parseArgsOld() {
-
-        int numberOfThreads = 0;
-        long maxDownloadSpeed = 0;
-        String fileNameWithLinks = "";
-        String outputFolder = "";
-        boolean debug = false;
-
-        for (int i = 0; i < args.length; i++) {
-            try {
-                switch (args[i]) {
-                    case NUMBER_OF_THREADS_KEY:
-                        numberOfThreads = (int) parseIntoNumber(args[i + 1]);
-                        break;
-
-                    case MAX_DOWNLOAD_SPEED_KEY:
-                        maxDownloadSpeed = parseIntoNumber(args[i + 1]);
-                        break;
-
-                    case FILE_NAME_WITH_LINKS_KEY:
-                        fileNameWithLinks = checkArg(args[i + 1]);
-                        break;
-
-                    case OUTPUT_FOLDER_KEY:
-                        outputFolder = checkArg(args[i + 1]);
-                        break;
-
-                    case DEBUG_KEY:
-                        debug = Boolean.valueOf(args[i + 1]);
-                        break;
-                    default:
-                }
-            } catch (ArrayIndexOutOfBoundsException e) {
-                LOG.log(Level.INFO, "Index of parameter out of array bounds");
-            }
-        }
-
-        LOG.log(Level.INFO, "Parsing of command line parameters was done");
-
-        return new Parameters(numberOfThreads, maxDownloadSpeed, fileNameWithLinks, outputFolder, debug);
-    }
-*/
-
-    /**
-     * Checks arg for correctness.
-     * @param arg   the current parameter for checking
-     * @return      the <code>arg</code> without change if it is correct, otherwise return empty string
-     */
-    private String checkArg(String arg) {
-        if (arg == null || "".equals(arg) || arg.charAt(0) == '-') {
-            return "";
-        }
-        return arg;
-    }
-
-    /**
      * Processing the string into a number except negative numbers.
      * Recognize suffix k or K as a factor 1024 (kilobyte) and m or M as a factor 1024*1024 (megabyte)
      * @param arg   the string for processing
      * @return      a number correspondent to arg or 0L if the string does not contain a
      *             parsable number or it is negative
      */
-    private long parseIntoNumber(String arg) {
+    private long parseIntoNumber(String arg) throws IncorrectInputParameters {
 
         if (arg == null || arg.length() == 0 || arg.charAt(0) == '-') {
             return 0L;
@@ -228,7 +157,7 @@ public class ParserParameters {
         try {
             resultInLong = Long.parseLong(resultString.toString()) * scale;
         } catch (NumberFormatException e) {
-            LOG.log(Level.WARNING, "Parsing into the number was fail. " + e.getMessage());
+            throw new IncorrectInputParameters("Parsing command line parameters into the number was fail.", e);
         }
 
         return resultInLong;

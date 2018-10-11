@@ -11,7 +11,7 @@ public interface Connection {
      * Gets content length
      * @return length of content from input source
      */
-    long getContentLength();
+    long getContentLength() throws IOException;
 
     /**
      * Gets input stream
@@ -23,7 +23,7 @@ public interface Connection {
     /**
      * Closes current connection
      */
-    void disconnect();
+    void disconnect() throws IOException;
 
     /**
      * Gets status of connection

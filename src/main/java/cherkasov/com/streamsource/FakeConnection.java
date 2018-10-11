@@ -11,42 +11,39 @@ public class FakeConnection implements Connection {
     private boolean connected;
 
     public FakeConnection(InputStream inputStream) {
+
         this.inputStream = inputStream;
         this.connected = true;
     }
 
     @Override
     public boolean connect() {
+
         return true;
     }
 
     @Override
     public boolean isConnected() {
+
         return connected;
     }
 
 
     @Override
-    public long getContentLength() {
-        try {
-            return inputStream.available();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return 0;
+    public long getContentLength() throws IOException {
+
+        return inputStream.available();
     }
 
     @Override
     public InputStream getInputStream() {
+
         return inputStream;
     }
 
     @Override
-    public void disconnect() {
-        try {
+    public void disconnect() throws IOException {
+
             inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

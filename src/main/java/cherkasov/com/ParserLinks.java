@@ -18,6 +18,9 @@ import static cherkasov.com.ProjectLogger.LOG;
 public class ParserLinks {
     private final String fileName;
 
+    //if line is fewer than 12 chars length, then line is useless because there are not urls (http://a.b/c)
+    private final int urlLength = 12;
+
     public ParserLinks(String fileName) {
         this.fileName = fileName;
     }
@@ -52,8 +55,7 @@ public class ParserLinks {
 
         for (String line : lines) {
 
-            //if line is fewer than 12 chars length, then line is useless because there are not urls
-            if (line.length() < 12) {
+            if (line.length() < urlLength) {
                 continue;
             }
 
