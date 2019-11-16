@@ -65,8 +65,8 @@ public class Manager {
         final ParserParameters parserParameters = new ParserParameters();
         final Parameters parameters = parserParameters.parseArgs(args);
 
-        if (parameters == null) {
-            throw new IncorrectInputParameters("Parameters is null.");
+        if (parameters.equals(Parameters.EMPTY)) {
+            System.exit(-1);
         }
 
         if (parameters.isDebug()) {

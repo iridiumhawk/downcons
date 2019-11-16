@@ -5,10 +5,12 @@ package cherkasov.com;
  */
 public class Parameters {
     private final int numberOfThreads ;
-    private final long maxDownloadSpeed ; //bytes in second
+    //bytes in second
+    private final long maxDownloadSpeed ;
     private final String fileNameWithLinks;
     private final String outputFolder ;
     private boolean debug = false;
+    static Parameters EMPTY = new Parameters(0, 0,"", "", false);
 
     public Parameters(int numberOfThreads, long maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {
 
