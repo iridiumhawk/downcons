@@ -1,9 +1,8 @@
-package cherkasov.com;
+package cherkasov.com
 
 /**
  * Type of connection
  */
-public enum ConnectionType {
-    HTTP,
-    FAKE
+enum class ConnectionType {
+    HTTP, FAKE
 }

@@ -1,7 +1,6 @@
 package cherkasov.com.integration;
 
 import cherkasov.com.Manager;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.logging.Level;

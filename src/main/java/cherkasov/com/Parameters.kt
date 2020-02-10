@@ -1,69 +1,37 @@
-package cherkasov.com;
+package cherkasov.com
 
 /**
  * Stores the command line parameters
  */
-public class Parameters {
-    private final int numberOfThreads ;
+class Parameters(numberOfThreads: Int, maxDownloadSpeed: Long, fileNameWithLinks: String?, outputFolder: String?, debug: Boolean) {
+    val numberOfThreads: Int = if (numberOfThreads > 0) numberOfThreads else 1
     //bytes in second
-    private final long maxDownloadSpeed ;
-    private final String fileNameWithLinks;
-    private final String outputFolder ;
-    private boolean debug = false;
-    static Parameters EMPTY = new Parameters(0, 0,"", "", false);
+    val maxDownloadSpeed: Long = if (maxDownloadSpeed > 0) maxDownloadSpeed else 1000000
+    val fileNameWithLinks: String = if (fileNameWithLinks == null || "" == fileNameWithLinks) "links.txt" else fileNameWithLinks
+    val outputFolder: String = if (outputFolder == null || "" == outputFolder) "download" else outputFolder
+    var isDebug = debug
 
-    public Parameters(int numberOfThreads, long maxDownloadSpeed, String fileNameWithLinks, String outputFolder, boolean debug) {
-
-        //check and set default values if necessary
-        // TODO: 22.06.2018 change defaults on exception
-        this.numberOfThreads = numberOfThreads > 0 ? numberOfThreads : 1;
-        this.maxDownloadSpeed = maxDownloadSpeed > 0 ? maxDownloadSpeed : 1000000;
-        this.fileNameWithLinks = (fileNameWithLinks == null || "".equals(fileNameWithLinks)) ? "links.txt" : fileNameWithLinks;
-        this.outputFolder = (outputFolder == null || "".equals(outputFolder)) ? "download" : outputFolder;
-        this.debug = debug;
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val that = o as Parameters
+        if (numberOfThreads != that.numberOfThreads) return false
+        if (maxDownloadSpeed != that.maxDownloadSpeed) return false
+        if (isDebug != that.isDebug) return false
+        return if (fileNameWithLinks != that.fileNameWithLinks) false else outputFolder == that.outputFolder
     }
 
-    public boolean isDebug() {
-        return debug;
+    override fun hashCode(): Int {
+        var result = numberOfThreads
+        result = 31 * result + java.lang.Long.hashCode(maxDownloadSpeed)
+        result = 31 * result + fileNameWithLinks.hashCode()
+        result = 31 * result + outputFolder.hashCode()
+        result = 31 * result + if (isDebug) 1 else 0
+        return result
     }
 
-    public int getNumberOfThreads() {
-        return numberOfThreads;
-    }
-
-    public long getMaxDownloadSpeed() {
-        return maxDownloadSpeed;
-    }
-
-    public String getFileNameWithLinks() {
-        return fileNameWithLinks;
-    }
-
-    public String getOutputFolder() {
-        return outputFolder;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Parameters that = (Parameters) o;
-
-        if (getNumberOfThreads() != that.getNumberOfThreads()) return false;
-        if (getMaxDownloadSpeed() != that.getMaxDownloadSpeed()) return false;
-        if (isDebug() != that.isDebug()) return false;
-        if (!getFileNameWithLinks().equals(that.getFileNameWithLinks())) return false;
-        return getOutputFolder().equals(that.getOutputFolder());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getNumberOfThreads();
-        result = 31 * result + Long.hashCode(getMaxDownloadSpeed());
-        result = 31 * result + getFileNameWithLinks().hashCode();
-        result = 31 * result + getOutputFolder().hashCode();
-        result = 31 * result + (isDebug() ? 1 : 0);
-        return result;
+    companion object {
+        @JvmField
+        var EMPTY = Parameters(0, 0, "", "", false)
     }
 }

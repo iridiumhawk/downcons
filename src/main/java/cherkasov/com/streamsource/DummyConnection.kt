@@ -1,36 +1,26 @@
-package cherkasov.com.streamsource;
+package cherkasov.com.streamsource
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.IOException
+import java.io.InputStream
 
 /**
  * Dummy
  * For test purposes only
  * All methods return false or null
  */
+class DummyConnection : Connection {
+    override val contentLength: Long
+        get() = 0
 
-public class DummyConnection implements Connection {
-    @Override
-    public long getContentLength() {
-        return 0;
-    }
+    @get:Throws(IOException::class)
+    override val inputStream: InputStream?
+        get() = null
 
-    @Override
-    public InputStream getInputStream() throws IOException {
-        return null;
-    }
+    override fun disconnect() {}
+    override val isConnected: Boolean
+        get() = false
 
-    @Override
-    public void disconnect() {
-    }
-
-    @Override
-    public boolean isConnected() {
-        return false;
-    }
-
-    @Override
-    public boolean connect() {
-        return false;
+    override fun connect(): Boolean {
+        return false
     }
 }

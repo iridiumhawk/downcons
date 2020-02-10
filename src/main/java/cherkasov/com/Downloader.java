@@ -2,13 +2,17 @@ package cherkasov.com;
 
 import cherkasov.com.streamsource.*;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -233,12 +237,12 @@ public class Downloader {
 
         String fileName = Paths.get(parameters.getOutputFolder(), task.getFileName()).toString();
 
-        final long contentLength = connection.getContentLength();
+        final long contentLength = connection.contentLength;
         long bytesDownloaded = 0;
         long timeSpentByTask = 0;
 
         // opens input stream from the HTTP connection
-        try (ReadableByteChannel readableByteChannel = Channels.newChannel(connection.getInputStream());
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(connection.inputStream);
              FileOutputStream fileOutputStream = new FileOutputStream(fileName)) {
 
             long numBytesRead;

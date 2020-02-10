@@ -1,39 +1,42 @@
-package cherkasov.com.streamsource;
+package cherkasov.com.streamsource
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.IOException
+import java.io.InputStream
 
 /**
  * API for connection to input source
  */
-public interface Connection {
+interface Connection {
     /**
      * Gets content length
      * @return length of content from input source
      */
-    long getContentLength() throws IOException;
+    @get:Throws(IOException::class)
+    val contentLength: Long
 
     /**
      * Gets input stream
      * @return input stream for established connection
      * @throws IOException if input stream is not available
      */
-    InputStream getInputStream() throws IOException;
+    @get:Throws(IOException::class)
+    val inputStream: InputStream?
 
     /**
      * Closes current connection
      */
-    void disconnect() throws IOException;
+    @Throws(IOException::class)
+    fun disconnect()
 
     /**
      * Gets status of connection
      * @return status of connection
      */
-    boolean isConnected();
+    val isConnected: Boolean
 
     /**
      * Connects to given source
-     * @return <code>true</code> if the connection established
+     * @return `true` if the connection established
      */
-    boolean connect();
+    fun connect(): Boolean
 }

@@ -1,68 +1,51 @@
-package cherkasov.com.streamsource;
+package cherkasov.com.streamsource
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.logging.Level;
-
-import static cherkasov.com.ProjectLogger.LOG;
+import cherkasov.com.ProjectLogger.LOG
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.logging.Level
 
 /**
  * Connection to the given URL on HTTP server
  */
-public class HttpConnection implements Connection {
-    private HttpURLConnection httpURLConnection;
-    private String url;
-    private boolean connected = false;
-
-    public HttpConnection(String url) {
-        this.url = url;
+class HttpConnection(private val url: String?) : Connection {
+    private var httpURLConnection: HttpURLConnection? = null
+    override var isConnected: Boolean = false
+        get() {
+        return field
     }
+        private set
 
-    @Override
-    public boolean connect() {
-
-        if (url == null || url.equals("")) {
-            return false;
+    override fun connect(): Boolean {
+        if (url == null || url == "") {
+            return false
         }
-
         try {
-            URL link = new URL(url);
-            httpURLConnection = (HttpURLConnection) link.openConnection();
-            int responseCode = httpURLConnection.getResponseCode();
-
+            val link = URL(url)
+            httpURLConnection = link.openConnection() as HttpURLConnection
+            val responseCode = httpURLConnection!!.responseCode
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                LOG.log(Level.WARNING, "Response Code, " + responseCode);
-                return false;
+                LOG.log(Level.WARNING, "Response Code, $responseCode")
+                return false
             }
-
-        } catch (IOException e) {
-            LOG.log(Level.WARNING, "URLException Exception, " + e.getMessage());
-            return false;
+        } catch (e: IOException) {
+            LOG.log(Level.WARNING, "URLException Exception, " + e.message)
+            return false
         }
-
-       return connected = true;
+        return true.also { isConnected = it }
     }
 
-    @Override
-    public boolean isConnected() {
-        return connected;
+    override val contentLength: Long
+        get() = httpURLConnection!!.contentLengthLong
+
+    @get:Throws(IOException::class)
+    override val inputStream: InputStream
+        get() = httpURLConnection!!.inputStream
+
+    override fun disconnect() {
+        httpURLConnection!!.disconnect()
     }
 
-
-    @Override
-    public long getContentLength() {
-        return httpURLConnection.getContentLengthLong();
-    }
-
-    @Override
-    public InputStream getInputStream() throws IOException {
-        return httpURLConnection.getInputStream();
-    }
-
-    @Override
-    public void disconnect() {
-        httpURLConnection.disconnect();
-    }
 }

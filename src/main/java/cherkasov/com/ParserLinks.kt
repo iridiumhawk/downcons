@@ -1,42 +1,33 @@
-package cherkasov.com;
+package cherkasov.com
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-
-import static cherkasov.com.ProjectLogger.LOG;
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.logging.Level
 
 /**
  *
  * Parses the file with links and put them in the tasks queue
  */
-public class ParserLinks {
-    private final String fileName;
-
+class ParserLinks(private val fileName: String) {
     //if line is fewer than 12 chars length, then line is useless because there are not urls (http://a.b/c)
-    private final int urlLength = 12;
-
-    public ParserLinks(String fileName) {
-        this.fileName = fileName;
-    }
+    private val urlLength = 12
 
     /**
      * Loads the file with links and splits it into the lines.
      * @return      a list of lines reading from the file
      * @throws      IOException if the file does not exist
      */
-    public List<String> loadFile() throws IOException {
-
+    @Throws(IOException::class)
+    fun loadFile(): List<String> {
         if (!Files.exists(Paths.get(fileName))) {
-            throw  new FileNotFoundException("File with links does not exist.");
+            throw FileNotFoundException("File with links does not exist.")
         }
-
-        return Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+        return Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8)
     }
 
     /**
@@ -45,36 +36,27 @@ public class ParserLinks {
      * @return          a task queue for downloading
      * @throws          NullPointerException if lines is null
      */
-    public Queue<TaskEntity> parseLinks(final List<String> lines)  {
-
+    fun parseLinks(lines: List<String>?): Queue<TaskEntity> {
         if (lines == null) {
-            throw new NullPointerException("List of links is null.");
+            throw NullPointerException("List of links is null.")
         }
-
-        final Queue<TaskEntity> queueTasks = new ConcurrentLinkedQueue<>();
-
-        for (String line : lines) {
-
-            if (line.length() < urlLength) {
-                continue;
+        val queueTasks: Queue<TaskEntity> = ConcurrentLinkedQueue()
+        for (line in lines) {
+            if (line.length < urlLength) {
+                continue
             }
-
             //comment line, go to next line
-            if (line.charAt(0) == '#') {
-                continue;
+            if (line[0] == '#') {
+                continue
             }
-
-            String[] urlAndFileName = line.trim().split(" ");
-
+            val urlAndFileName = line.trim { it <= ' ' }.split(" ").toTypedArray()
             //adds tasks to concurrency queue, from which the threads will be take url for download
-            if (urlAndFileName.length >= 2) {
-                queueTasks.add(new TaskEntity(urlAndFileName[0], urlAndFileName[1]));
+            if (urlAndFileName.size >= 2) {
+                queueTasks.add(TaskEntity(urlAndFileName[0], urlAndFileName[1]))
             }
         }
-
-        LOG.log(Level.INFO, "Parsing file with links was done");
-
-        return queueTasks;
+        ProjectLogger.LOG.log(Level.INFO, "Parsing file with links was done")
+        return queueTasks
     }
-}
 
+}
